@@ -64,6 +64,7 @@ public class ItemServiceImpl implements ItemService {
         List<Item> items = itemStorage.getItemsForRent(text);
         return items.stream().map(item -> itemMapper.fromItem(item)).collect(Collectors.toList());
     }
+
     private void checkUser(int id) {
         if (userStorage.getUser(id) == null) {
             log.debug("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!");

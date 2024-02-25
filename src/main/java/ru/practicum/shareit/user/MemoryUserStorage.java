@@ -46,6 +46,7 @@ public class MemoryUserStorage implements UserStorage {
     public void deleteUser(int id) {
         users.remove(id);
     }
+
     @Override
     public void checkEmailForService(String email, int id) {
         checkEmail(email, id);
