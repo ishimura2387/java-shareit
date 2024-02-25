@@ -11,32 +11,32 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
     @GetMapping
     public List<UserDto> findAllUsers() {
-        return userService.findAllUsers();
+        return userServiceImpl.findAllUsers();
     }
 
 
     @PostMapping
     public UserDto createUser(@Valid @RequestBody UserDto userDto) {
-        return userService.createUser(userDto);
+        return userServiceImpl.createUser(userDto);
     }
 
     @PatchMapping("/{userId}")
     public UserDto updateUser(@PathVariable int userId, @RequestBody UserDto userDto) {
         userDto.setId(userId);
-        return userService.updateUser(userDto);
+        return userServiceImpl.updateUser(userDto);
     }
 
     @DeleteMapping("/{userId}")
     public void deleteUser(@PathVariable int userId) {
-        userService.deleteUser(userId);
+        userServiceImpl.deleteUser(userId);
     }
 
     @GetMapping("/{id}")
     public UserDto getUser(@PathVariable int id) {
-        return userService.getUser(id);
+        return userServiceImpl.getUser(id);
     }
 }

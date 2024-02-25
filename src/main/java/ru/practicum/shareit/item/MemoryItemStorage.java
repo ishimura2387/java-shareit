@@ -1,7 +1,9 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.exception.NullObjectException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +12,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class MemoryItemStorage implements ItemStorage {
     private final Map<Integer, Item> items = new HashMap<>();
     private int counterItemId = 1;
@@ -32,20 +35,23 @@ public class MemoryItemStorage implements ItemStorage {
         return items.get(id);
     }
 
+    @Override
     public List<Item> getMyItems(int id) {
         List<Item> myItems = new ArrayList<>();
         for (Item item : items.values()) {
-            if (item.getOwner() == id) {
+            if (item.getOwner().getId() == id) {
                 myItems.add(item);
             }
         }
         return myItems;
     }
 
+    @Override
     public List<Item> getItemsForRent(String text) {
         List<Item> itemsForRent = new ArrayList<>();
+        String textLower = text.toLowerCase();
         for (Item item : items.values()) {
-            if (item.getAvailable() && (item.getName().toLowerCase().contains(text.toLowerCase()) ||
+            if (item.getAvailable() && (item.getName().toLowerCase().contains(textLower) ||
                     item.getDescription().toLowerCase().contains(text.toLowerCase()))) {
                 itemsForRent.add(item);
             }
@@ -53,7 +59,15 @@ public class MemoryItemStorage implements ItemStorage {
         return itemsForRent;
     }
 
-    public List<Integer> findAllItemsId() {
-        return new ArrayList<>(items.keySet());
+    @Override
+    public void checkItemForService(int id) {
+        checkItem(id);
+    }
+
+    private void checkItem(int id) {
+        if (items.get(id) == null) {
+            log.debug("Ошибка проверки вещи на наличие в Storage! Вещь не найдена!");
+            throw new NullObjectException("Вещь не найдена!");
+        }
     }
 }

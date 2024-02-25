@@ -13,5 +13,5 @@ public interface ItemStorage {
 
     List<Item> getItemsForRent(String text);
 
-    List<Integer> findAllItemsId();
+    void checkItemForService(int id);
 }

@@ -12,5 +12,4 @@ public interface ItemService {
     List<ItemDto> getMyItems(int id);
 
     List<ItemDto> getItemsForRent(String text);
-
 }

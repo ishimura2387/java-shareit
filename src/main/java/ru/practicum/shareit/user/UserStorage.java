@@ -13,5 +13,7 @@ public interface UserStorage {
 
     void deleteUser(int id);
 
-    List<Integer> findAllUsersId();
+    void checkEmailForService(String email, int id);
+
+    void checkUserForService(int id);
 }

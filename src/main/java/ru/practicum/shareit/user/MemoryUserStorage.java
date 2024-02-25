@@ -3,11 +3,14 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.exception.NullObjectException;
+import ru.practicum.shareit.exception.SameEmailException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -43,9 +46,31 @@ public class MemoryUserStorage implements UserStorage {
     public void deleteUser(int id) {
         users.remove(id);
     }
+    @Override
+    public void checkEmailForService(String email, int id) {
+        checkEmail(email, id);
+    }
 
     @Override
-    public List<Integer> findAllUsersId() {
-        return new ArrayList<>(users.keySet());
+    public void checkUserForService(int id) {
+        checkUser(id);
+    }
+
+    private void checkUser(int id) {
+        if (users.get(id) == null) {
+            log.debug("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!");
+            throw new NullObjectException("Пользователь не найден!");
+        }
+    }
+
+    private void checkEmail(String email, int id) { // вытащить в слой storage не получается как не пробовал,
+        if (email != null) {
+            List<User> usersWithSomeEmail = users.values().stream()
+                    .filter(user -> user.getEmail().equals(email)).collect(Collectors.toList());
+            if (usersWithSomeEmail.size() > 0 && usersWithSomeEmail.get(0).getId() != id) {
+                log.debug("Пользователь с таким email уже существует!");
+                throw new SameEmailException("Пользователь с таким email уже существует!");
+            }
+        }
     }
 }
