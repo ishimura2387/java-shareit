@@ -26,4 +26,39 @@ public class ErrorHandler {
         return new ErrorResponse(String.format("Ошибка валидации владельца: %s ", e.getMessage()));
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidationTimeBookingValidationException(final TimeBookingValidationException e) {
+        return new ErrorResponse(String.format("Ошибка валидации времени бронирования: %s ", e.getMessage()));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleValidationSetStatusBookingException(final SetStatusBookingException e) {
+        return new ErrorResponse(String.format("Ошибка изменения статуса бронирования: %s ", e.getMessage()));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleStateException(final StateException e) {
+        return new ErrorResponse(String.format(e.getMessage()));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidationNoOneApprovedException(final NoOneApprovedException e) {
+        return new ErrorResponse(String.format(e.getMessage()));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidationAvailableException(final AvailableException e) {
+        return new ErrorResponse(String.format("Ошибка бронирования вещи: %s ", e.getMessage()));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidationCommentException(final CommentException e) {
+        return new ErrorResponse(String.format(e.getMessage()));
+    }
 }

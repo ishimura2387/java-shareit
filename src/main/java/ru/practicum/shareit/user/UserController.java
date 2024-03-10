@@ -11,7 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userServiceImpl;
 
     @GetMapping
     public List<UserDto> findAllUsers() {
@@ -25,18 +25,18 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable int userId, @RequestBody UserDto userDto) {
+    public UserDto updateUser(@PathVariable long userId, @RequestBody UserDto userDto) {
         userDto.setId(userId);
         return userServiceImpl.updateUser(userDto);
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUser(@PathVariable int userId) {
+    public void deleteUser(@PathVariable long userId) {
         userServiceImpl.deleteUser(userId);
     }
 
     @GetMapping("/{id}")
-    public UserDto getUser(@PathVariable int id) {
+    public UserDto getUser(@PathVariable long id) {
         return userServiceImpl.getUser(id);
     }
 }
