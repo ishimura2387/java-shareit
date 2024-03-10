@@ -17,6 +17,7 @@ public class ItemController {
                                        @Valid @RequestBody CommentDto commentDto) {
         return itemService.createNewComment(commentDto, userId, itemId);
     }
+
     @PostMapping
     public ItemDto createNewItem(@RequestHeader("X-Sharer-User-Id") long userId, @Valid @RequestBody ItemDto itemDto) {
         return itemService.createNewItem(itemDto, userId);
