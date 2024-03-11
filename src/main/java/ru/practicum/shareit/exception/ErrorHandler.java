@@ -1,5 +1,6 @@
 package ru.practicum.shareit.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -16,7 +17,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleValidationSameEmailException(final SameEmailException e) {
+    public ErrorResponse handleValidationDataIntegrityViolationException(final DataIntegrityViolationException e) {
         return new ErrorResponse(String.format("ошибка валидации email: %s ", e.getMessage()));
     }
 

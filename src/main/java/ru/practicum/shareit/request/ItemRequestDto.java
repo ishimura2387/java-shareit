@@ -1,17 +1,22 @@
 package ru.practicum.shareit.request;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.practicum.shareit.user.User;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-@Data
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class ItemRequestDto {
-    public int id;
-    @NotNull
+    private int id;
+    @NotBlank
     private String description;
     @NotNull
     private User requestor;

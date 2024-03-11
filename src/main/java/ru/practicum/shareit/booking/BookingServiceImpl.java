@@ -2,13 +2,19 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.*;
+import ru.practicum.shareit.exception.AvailableException;
+import ru.practicum.shareit.exception.NoOneApprovedException;
+import ru.practicum.shareit.exception.NullObjectException;
+import ru.practicum.shareit.exception.OwnerException;
+import ru.practicum.shareit.exception.SetStatusBookingException;
+import ru.practicum.shareit.exception.StateException;
+import ru.practicum.shareit.exception.TimeBookingValidationException;
+import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,29 +32,31 @@ public class BookingServiceImpl implements BookingService {
 
     public BookingDto addBooking(BookingInputDto bookingInputDto, long userId) {
         Booking booking = bookingMapper.fromBookingDtoInput(bookingInputDto);
-        long idOwner = 0;
-        try {
-            booking.setItem(itemRepository.getById(booking.getItem().getId()));
-            booking.setBooker(userRepository.getById(userId));
-            idOwner = booking.getItem().getOwner().getId();
-        } catch (EntityNotFoundException e) {
-            log.debug("Ошибка проверки вещи и пользователя на наличие в Storage! Вещь не найдена!");
-            throw new NullObjectException("Вещь не найдена!");
-        }
-        checkUser(userId);
-        if (!booking.getItem().getAvailable()) {
+        Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
+                "вещи на наличие в Storage! Вещь не найдена!"));
+        booking.setItem(item);
+        User booker = userRepository.findById(userId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
+                "пользователя на наличие в Storage! Пользователь не найден!"));
+        booking.setBooker(booker);
+        if (!item.getAvailable()) {
             log.debug("Ошибка бронирования вещи! Вещь недоступна для бронирования!");
             throw new AvailableException("Вещь недоступна для бронирования!");
         }
-        if (userId == idOwner) {
+        if (userId == item.getOwner().getId()) {
             log.debug("Ошибка бронирования вещи! Вещь недоступна для бронирования!");
             throw new OwnerException("Пользователь не может забронировать свою вещь!");
         }
-        if (booking.getEnd() == null || booking.getStart() == null || booking.getEnd().isBefore(booking.getStart()) || booking.getStart().isBefore(LocalDateTime.now()) ||
-                booking.getEnd().isBefore(LocalDateTime.now()) || booking.getEnd().equals(booking.getStart())
-        ) {
+        if (booking.getEnd().isBefore(booking.getStart()) ||
+                booking.getStart().isBefore(LocalDateTime.now()) || booking.getEnd().isBefore(LocalDateTime.now()) ||
+                booking.getEnd().equals(booking.getStart())) {
             log.debug("Ошибка валидации времени бронирования!");
-            throw new TimeBookingValidationException("Конец бронирования не ожет быть раньше начала бронирования!");
+            throw new TimeBookingValidationException("Время бронирования не корректно!");
+        }
+        List<Booking> bookings = bookingRepository.findAllByItemIdAndEndBetweenOrStartBetween(booking.getItem().getId(),
+                booking.getStart(), booking.getEnd());
+        if (bookings.size() > 0) {
+            log.debug("Ошибка валидации времени бронирования!");
+            throw new TimeBookingValidationException("На данное время уже есть бронирование!");
         }
         booking.setStatus(Status.WAITING);
         log.debug("Обработка запроса POST /items. Создано бронирование: {}", booking);
@@ -57,43 +65,37 @@ public class BookingServiceImpl implements BookingService {
     }
 
     public BookingDto setBookingStatus(long bookingId, boolean approved, long idUser) {
-        try {
-            Booking booking = bookingRepository.getById(bookingId);
-            if (booking.getStatus().equals(Status.APPROVED)) {
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new NullObjectException("Ошибка " +
+                "проверки бронирования на наличие в Storage! Бронирование не найдено!"));
+        if (booking.getStatus().equals(Status.APPROVED)) {
                 throw new NoOneApprovedException("Статус уже подтвержден!");
             }
-            if (booking.getItem().getOwner().getId() != idUser) {
+        if (booking.getItem().getOwner().getId() != idUser) {
                 throw new SetStatusBookingException("Подтверждение бронирования доступно только владельцу вещи!");
             }
-            if (approved) {
+        if (approved) {
                 booking.setStatus(Status.APPROVED);
-            } else {
+        } else {
                 booking.setStatus(Status.REJECTED);
-            }
-            bookingRepository.save(booking);
-            return bookingMapper.fromBooking(booking);
-        } catch (EmptyResultDataAccessException e) {
-            log.debug("Ошибка проверки бронирования на наличие в Storage! Бронирование не найдено!");
-            throw new NullObjectException("Бронирование не найдено!");
         }
+        bookingRepository.save(booking);
+        return bookingMapper.fromBooking(booking);
     }
 
     public BookingDto getBooking(long idBooking, long idUser) {
-        try {
-            checkUser(idUser);
-            Booking booking = bookingRepository.getById(idBooking);
-            if (!(booking.getItem().getOwner().getId() == idUser || booking.getBooker().getId() == idUser)) {
-                log.debug("Ошибка запроса бронирования!");
-                throw new OwnerException("Запрашивать бронирование может только автор или собственник вещи");
-            }
-            return bookingMapper.fromBooking(booking);
-        } catch (EntityNotFoundException e) {
-            throw new NullObjectException("Бронирование не найдено!");
+        Booking booking = bookingRepository.findById(idBooking).filter(b -> b.getBooker().getId() == idUser ||
+                b.getItem().getOwner().getId() == idUser).orElseThrow(() -> new NullObjectException("Ошибка " +
+                "проверки бронирования на наличие в Storage! Бронирование не найдено!"));
+        if (!(booking.getItem().getOwner().getId() == idUser || booking.getBooker().getId() == idUser)) {
+            log.debug("Ошибка запроса бронирования!");
+            throw new OwnerException("Запрашивать бронирование может только автор или собственник вещи");
         }
+        return bookingMapper.fromBooking(booking);
     }
 
     public List<BookingDto> getBookingsByUser(long userId, String state) {
-        checkUser(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
+                "пользователя на наличие в Storage! Пользователь не найден!"));
         if (!Arrays.stream(State.values()).anyMatch(e -> e.name().equals(state))) {
             throw new StateException("Unknown state: " + state);
         }
@@ -122,7 +124,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     public List<BookingDto> getBookingsByOwner(long ownerId, String state) {
-        checkUser(ownerId);
+        User owner = userRepository.findById(ownerId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
+                "пользователя на наличие в Storage! Пользователь не найден!"));
         if (!Arrays.stream(State.values()).anyMatch(e -> e.name().equals(state))) {
             throw new StateException("Unknown state: " + state);
         }
@@ -148,13 +151,5 @@ public class BookingServiceImpl implements BookingService {
                 break;
         }
         return bookings.stream().map(booking -> bookingMapper.fromBooking(booking)).collect(Collectors.toList());
-
-    }
-
-    private void checkUser(long id) {
-        if (userRepository.findById(id).isEmpty()) {
-            log.debug("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!");
-            throw new NullObjectException("Пользователь не найден!");
-        }
     }
 }
