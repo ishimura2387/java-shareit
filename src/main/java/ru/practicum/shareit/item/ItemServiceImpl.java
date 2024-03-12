@@ -38,10 +38,11 @@ public class ItemServiceImpl implements ItemService {
             log.debug("Ошибка проверки на возможность оставлять отзывы");
             throw new CommentException("Чтобы оставлять отзывы нужно иметь завершенное бронирование вещи!");
         }
-        Comment comment = commentMapper.toComment(commentDto);
-        comment.setItem(bookings.get(0).getItem()); //доп. обращение к БД можно жн и так убрать?
-        comment.setAuthor(bookings.get(0).getBooker()); //доп. обращение к БД можно жн и так убрать?
-        comment.setCreated(LocalDateTime.now());
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
+                "вещи на наличие в Storage! Вещь не найдена!"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
+                "пользователя на наличие в Storage! Пользователь не найден!"));
+        Comment comment = commentMapper.toComment(commentDto, user, item);
         log.debug("Обработка запроса POST /items/{itemId}/comment. Создан отзыв: {}", comment);
         return commentMapper.fromComment(commentRepository.save(comment));
     }
@@ -59,8 +60,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto updateItem(ItemDto itemDto, long userId, long itemId) {
-        Item oldItem = itemRepository.findById(itemId).filter(i -> i.getOwner().getId() == userId).orElseThrow(() ->
-                new NullObjectException("Ошибка проверки вещи на наличие в Storage! Вещь не найдена!"));
+        Item oldItem = itemRepository.findByIdAndOwnerId(itemId, userId);
         Item item = itemMapper.updateItem(itemDto, oldItem);
         item.setOwner(oldItem.getOwner());
         log.debug("Обработка запроса PUT /items. Вещь изменена: {}", item);
