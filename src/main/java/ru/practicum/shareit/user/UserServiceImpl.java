@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.NullObjectException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,43 +12,43 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
-
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     public List<UserDto> findAllUsers() {
-        List<User> users = userStorage.findAllUsers();
+        List<User> users = userRepository.findAll();
         log.debug("Обработка запроса GET /users; Текущее количество пользователей: {}",
                 users.size());
         return users.stream().map(user -> userMapper.fromUser(user)).collect(Collectors.toList());
     }
 
     public UserDto createUser(UserDto userDto) {
-        userStorage.checkEmailForService(userDto.getEmail(), userDto.getId());
         User user = userMapper.toUser(userDto);
         log.debug("Обработка запроса POST /users. Создан пользователь: {}", user);
-        userDto = userMapper.fromUser(userStorage.createNewUser(user));
+        userDto = userMapper.fromUser(userRepository.save(user));
         return userDto;
     }
 
     public UserDto updateUser(UserDto userDto) {
-        int id = userDto.getId();
-        userStorage.checkUserForService(id);
-        userStorage.checkEmailForService(userDto.getEmail(), userDto.getId());
-        User user = userMapper.updateUser(userDto, userStorage.getUser(id));
+        long id = userDto.getId();
+        User userOld = userRepository.findById(id).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
+                "пользователя на наличие в Storage! Пользователь не найден!"));
+        User user = userMapper.updateUser(userDto, userOld);
         log.debug("Обработка запроса PUT /users. Пользователь изменен: {}", user);
-        return userMapper.fromUser(userStorage.updateUser(user));
+        return userMapper.fromUser(userRepository.save(user));
     }
 
-    public void deleteUser(Integer userId) {
-        userStorage.checkUserForService(userId);
+    public void deleteUser(long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
+                "пользователя на наличие в Storage! Пользователь не найден!"));
         log.debug("Обработка запроса DELETE /users.Пользователь удален: {}", userId);
-        userStorage.deleteUser(userId);
+        userRepository.deleteById(userId);
     }
 
-    public UserDto getUser(int id) {
-        userStorage.checkUserForService(id);
+    public UserDto getUser(long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
+                "пользователя на наличие в Storage! Пользователь не найден!"));
         log.debug("Обработка запроса GET /users.Запрошен пользователь c id: {}", id);
-        return userMapper.fromUser(userStorage.getUser(id));
+        return userMapper.fromUser(userRepository.getById(id));
     }
 }
