@@ -375,6 +375,4 @@ public class BookingServiceTest {
                 "Ошибка пагинации!");
         Assertions.assertEquals("Ошибка пагинации!", exception3.getMessage());
     }
-
-
 }
