@@ -86,10 +86,10 @@ public class RestBookingTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(bookingDto.getId()), Long.class))
-                .andExpect(jsonPath("$.start").value(Arrays.stream(bookingDto.getStart().format(dtf).
-                        split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
-                .andExpect(jsonPath("$.end").value(Arrays.stream(bookingDto.getEnd().format(dtf).
-                split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
+                .andExpect(jsonPath("$.start").value(Arrays.stream(bookingDto.getStart().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
+                .andExpect(jsonPath("$.end").value(Arrays.stream(bookingDto.getEnd().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
                 .andExpect(jsonPath("$.status", is(bookingDto.getStatus().toString())));
     }
 
@@ -107,12 +107,13 @@ public class RestBookingTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(bookingDto.getId()), Long.class))
-                .andExpect(jsonPath("$.start").value(Arrays.stream(bookingDto.getStart().format(dtf).
-                        split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
-                .andExpect(jsonPath("$.end").value(Arrays.stream(bookingDto.getEnd().format(dtf).
-                        split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
+                .andExpect(jsonPath("$.start").value(Arrays.stream(bookingDto.getStart().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
+                .andExpect(jsonPath("$.end").value(Arrays.stream(bookingDto.getEnd().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
                 .andExpect(jsonPath("$.status", is(bookingDto.getStatus().toString())));
     }
+
     @Test
     void getBookingTest() throws Exception {
         when(bookingService.getBooking(any(Long.class), any(Long.class)))
@@ -126,13 +127,12 @@ public class RestBookingTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(bookingDto.getId()), Long.class))
-                .andExpect(jsonPath("$.start").value(Arrays.stream(bookingDto.getStart().format(dtf).
-                        split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
-                .andExpect(jsonPath("$.end").value(Arrays.stream(bookingDto.getEnd().format(dtf).
-                        split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
+                .andExpect(jsonPath("$.start").value(Arrays.stream(bookingDto.getStart().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
+                .andExpect(jsonPath("$.end").value(Arrays.stream(bookingDto.getEnd().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
                 .andExpect(jsonPath("$.status", is(bookingDto.getStatus().toString()), Status.class));
     }
-
 
     @Test
     void getBookingsByUserTest() throws Exception {
@@ -149,10 +149,10 @@ public class RestBookingTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.[0].id", is(bookingDto.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].start").value(Arrays.stream(bookingDto.getStart().format(dtf).
-                        split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
-                .andExpect(jsonPath("$.[0].end").value(Arrays.stream(bookingDto.getEnd().format(dtf).
-                        split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
+                .andExpect(jsonPath("$.[0].start").value(Arrays.stream(bookingDto.getStart().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
+                .andExpect(jsonPath("$.[0].end").value(Arrays.stream(bookingDto.getEnd().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
                 .andExpect(jsonPath("$.[0].item.id", is(bookingDto.getItem().getId()), Long.class))
                 .andExpect(jsonPath("$.[0].booker.id", is(bookingDto.getBooker().getId()), Long.class))
                 .andExpect(jsonPath("$.[0].status", is(bookingDto.getStatus().toString())));
@@ -173,10 +173,10 @@ public class RestBookingTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.[0].id", is(bookingDto.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].start").value(Arrays.stream(bookingDto.getStart().format(dtf).
-                        split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
-                .andExpect(jsonPath("$.[0].end").value(Arrays.stream(bookingDto.getEnd().format(dtf).
-                        split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
+                .andExpect(jsonPath("$.[0].start").value(Arrays.stream(bookingDto.getStart().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
+                .andExpect(jsonPath("$.[0].end").value(Arrays.stream(bookingDto.getEnd().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
                 .andExpect(jsonPath("$.[0].item.id", is(bookingDto.getItem().getId()), Long.class))
                 .andExpect(jsonPath("$.[0].booker.id", is(bookingDto.getBooker().getId()), Long.class))
                 .andExpect(jsonPath("$.[0].status", is(bookingDto.getStatus().toString())));

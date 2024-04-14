@@ -77,8 +77,8 @@ public class RestRequestTest {
                 .andExpect(jsonPath("$.requestor.id", is(itemRequestDto.getRequestor().getId()), Long.class))
                 .andExpect(jsonPath("$.requestor.name", is(itemRequestDto.getRequestor().getName())))
                 .andExpect(jsonPath("$.requestor.email", is(itemRequestDto.getRequestor().getEmail())))
-                .andExpect(jsonPath("$.created").value(Arrays.stream(itemRequestDto.getCreated().format(dtf).
-                        split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
+                .andExpect(jsonPath("$.created").value(Arrays.stream(itemRequestDto.getCreated().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
     }
 
     @Test
@@ -96,8 +96,8 @@ public class RestRequestTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.[0].id", is(itemRequestDtoOutput.getId()), Long.class))
                 .andExpect(jsonPath("$.[0].description", is(itemRequestDtoOutput.getDescription())))
-                .andExpect(jsonPath("$.[0].created").value(Arrays.stream(itemRequestDtoOutput.getCreated().format(dtf).
-                        split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
+                .andExpect(jsonPath("$.[0].created").value(Arrays.stream(itemRequestDtoOutput.getCreated().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
     }
 
     @Test
@@ -115,8 +115,8 @@ public class RestRequestTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.[0].id", is(itemRequestDtoOutput.getId()), Long.class))
                 .andExpect(jsonPath("$.[0].description", is(itemRequestDtoOutput.getDescription())))
-                .andExpect(jsonPath("$.[0].created").value(Arrays.stream(itemRequestDtoOutput.getCreated().format(dtf).
-                        split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
+                .andExpect(jsonPath("$.[0].created").value(Arrays.stream(itemRequestDtoOutput.getCreated().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
     }
 
     @Test
@@ -133,8 +133,8 @@ public class RestRequestTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(itemRequestDtoOutput.getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(itemRequestDtoOutput.getDescription())))
-                .andExpect(jsonPath("$.created").value(Arrays.stream(itemRequestDtoOutput.getCreated().format(dtf).
-                        split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
+                .andExpect(jsonPath("$.created").value(Arrays.stream(itemRequestDtoOutput.getCreated().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
     }
 }
 

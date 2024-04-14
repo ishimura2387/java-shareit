@@ -82,8 +82,8 @@ public class RestItemTest {
                 .andExpect(jsonPath("$.id", is(commentDto.getId()), Long.class))
                 .andExpect(jsonPath("$.text", is(commentDto.getText())))
                 .andExpect(jsonPath("$.authorName", is(commentDto.getAuthorName())))
-                .andExpect(jsonPath("$.created").value(Arrays.stream(commentDto.getCreated().format(dtf).
-                        split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
+                .andExpect(jsonPath("$.created").value(Arrays.stream(commentDto.getCreated().format(dtf)
+                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
     }
 
     @Test
