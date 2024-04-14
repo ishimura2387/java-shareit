@@ -93,7 +93,7 @@ public class RequestServiceImpl implements RequestService {
                 throw new PaginationException("Ошибка пагинации!");
             }
             int page;
-            if (from == size) {
+            if (from.longValue() == size.longValue()) {
                 page = from / size - 1;
             } else {
                 page = from / size;
