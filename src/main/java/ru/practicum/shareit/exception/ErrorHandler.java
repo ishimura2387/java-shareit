@@ -62,4 +62,10 @@ public class ErrorHandler {
     public ErrorResponse handleValidationCommentException(final CommentException e) {
         return new ErrorResponse(String.format(e.getMessage()));
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidationPaginationException(final PaginationException e) {
+        return new ErrorResponse(String.format(e.getMessage()));
+    }
 }

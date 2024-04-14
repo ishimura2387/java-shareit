@@ -9,9 +9,9 @@ public interface ItemService {
 
     ItemDtoWithDate getItem(long itemId, long userId);
 
-    List<ItemDtoWithDate> getMyItems(long id);
+    List<ItemDtoWithDate> getMyItems(long id, Integer from, Integer size);
 
-    List<ItemDto> getItemsForRent(String text);
+    List<ItemDto> getItemsForRent(String text, Integer from, Integer size);
 
     CommentDto createNewComment(CommentDto commentDto, long userId, long itemId);
 }

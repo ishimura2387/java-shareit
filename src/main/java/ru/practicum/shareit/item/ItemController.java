@@ -43,12 +43,16 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getItemsForRent(@RequestParam String text) {
-        return itemService.getItemsForRent(text);
+    public List<ItemDto> getItemsForRent(@RequestParam String text,
+                                         @RequestParam(defaultValue = "0") Integer from,
+                                         @RequestParam(required = false) Integer size) {
+        return itemService.getItemsForRent(text, from, size);
     }
 
     @GetMapping
-    public List<ItemDtoWithDate> getMyItems(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return itemService.getMyItems(userId);
+    public List<ItemDtoWithDate> getMyItems(@RequestHeader("X-Sharer-User-Id") long userId,
+                                            @RequestParam(defaultValue = "0") Integer from,
+                                            @RequestParam(required = false) Integer size) {
+        return itemService.getMyItems(userId, from, size);
     }
 }

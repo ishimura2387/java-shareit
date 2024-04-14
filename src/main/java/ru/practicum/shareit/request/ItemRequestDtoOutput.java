@@ -4,19 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.item.ItemDtoRequestAnswer;
 
-import javax.validation.constraints.NotBlank;
+import java.util.List;
+
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class ItemRequestDto {
+public class ItemRequestDtoOutput {
     private long id;
-    @NotBlank
     private String description;
-    private User requestor;
     private LocalDateTime created;
+    private List<ItemDtoRequestAnswer> items;
 }
