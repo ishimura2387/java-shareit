@@ -22,10 +22,12 @@ import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserService;
+import java.util.concurrent.TimeUnit;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @SpringBootTest
@@ -267,7 +269,7 @@ public class BookingServiceTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getBookingByUserNullSizeTestTest() {
+    void getBookingByUserNullSizeTest() {
         LocalDateTime start = LocalDateTime.now();
         userService.createUser(userDto1);
         userService.createUser(userDto2);
@@ -277,6 +279,109 @@ public class BookingServiceTest {
         List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "FUTURE", 0, null);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusHours(1), start.plusHours(3), itemDto1, userDto2, Status.WAITING);
+        Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
+        Assertions.assertEquals(bookingDto1.getStart(), bookingDto2.getStart());
+        Assertions.assertEquals(bookingDto1.getEnd(), bookingDto2.getEnd());
+        Assertions.assertEquals(bookingDto1.getItem().getId(), bookingDto2.getItem().getId());
+        Assertions.assertEquals(bookingDto1.getBooker().getId(), bookingDto2.getBooker().getId());
+        Assertions.assertEquals(bookingDto1.getStatus(), bookingDto2.getStatus());
+    }
+
+    @Test
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+    void getBookingByUserCurrentTest() throws InterruptedException {
+        LocalDateTime start = LocalDateTime.now();
+        userService.createUser(userDto1);
+        userService.createUser(userDto2);
+        itemService.createNewItem(itemDto1, 1);
+        BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(20));
+        bookingService.addBooking(bookingInputDto, 2);
+        TimeUnit.SECONDS.sleep(2);
+        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "CURRENT", 0, null);
+        BookingDto bookingDto1 = bookingDtos.get(0);
+        BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(20), itemDto1, userDto2, Status.WAITING);
+        Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
+        Assertions.assertEquals(bookingDto1.getStart(), bookingDto2.getStart());
+        Assertions.assertEquals(bookingDto1.getEnd(), bookingDto2.getEnd());
+        Assertions.assertEquals(bookingDto1.getItem().getId(), bookingDto2.getItem().getId());
+        Assertions.assertEquals(bookingDto1.getBooker().getId(), bookingDto2.getBooker().getId());
+        Assertions.assertEquals(bookingDto1.getStatus(), bookingDto2.getStatus());
+    }
+
+    @Test
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+    void getBookingByUserPastTest() throws InterruptedException {
+        LocalDateTime start = LocalDateTime.now();
+        userService.createUser(userDto1);
+        userService.createUser(userDto2);
+        itemService.createNewItem(itemDto1, 1);
+        BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
+        bookingService.addBooking(bookingInputDto, 2);
+        TimeUnit.SECONDS.sleep(3);
+        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "PAST", 0, null);
+        BookingDto bookingDto1 = bookingDtos.get(0);
+        BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.WAITING);
+        Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
+        Assertions.assertEquals(bookingDto1.getStart(), bookingDto2.getStart());
+        Assertions.assertEquals(bookingDto1.getEnd(), bookingDto2.getEnd());
+        Assertions.assertEquals(bookingDto1.getItem().getId(), bookingDto2.getItem().getId());
+        Assertions.assertEquals(bookingDto1.getBooker().getId(), bookingDto2.getBooker().getId());
+        Assertions.assertEquals(bookingDto1.getStatus(), bookingDto2.getStatus());
+    }
+
+    @Test
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+    void getBookingByUserRejectedTest() {
+        LocalDateTime start = LocalDateTime.now();
+        userService.createUser(userDto1);
+        userService.createUser(userDto2);
+        itemService.createNewItem(itemDto1, 1);
+        BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
+        bookingService.addBooking(bookingInputDto, 2);
+        bookingService.setBookingStatus(1, false, 1);
+        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "REJECTED", 0, null);
+        BookingDto bookingDto1 = bookingDtos.get(0);
+        BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.REJECTED);
+        Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
+        Assertions.assertEquals(bookingDto1.getStart(), bookingDto2.getStart());
+        Assertions.assertEquals(bookingDto1.getEnd(), bookingDto2.getEnd());
+        Assertions.assertEquals(bookingDto1.getItem().getId(), bookingDto2.getItem().getId());
+        Assertions.assertEquals(bookingDto1.getBooker().getId(), bookingDto2.getBooker().getId());
+        Assertions.assertEquals(bookingDto1.getStatus(), bookingDto2.getStatus());
+    }
+
+    @Test
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+    void getBookingByUserDefaultTest() {
+        LocalDateTime start = LocalDateTime.now();
+        userService.createUser(userDto1);
+        userService.createUser(userDto2);
+        itemService.createNewItem(itemDto1, 1);
+        BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
+        bookingService.addBooking(bookingInputDto, 2);
+        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "ALL", 0, null);
+        BookingDto bookingDto1 = bookingDtos.get(0);
+        BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.WAITING);
+        Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
+        Assertions.assertEquals(bookingDto1.getStart(), bookingDto2.getStart());
+        Assertions.assertEquals(bookingDto1.getEnd(), bookingDto2.getEnd());
+        Assertions.assertEquals(bookingDto1.getItem().getId(), bookingDto2.getItem().getId());
+        Assertions.assertEquals(bookingDto1.getBooker().getId(), bookingDto2.getBooker().getId());
+        Assertions.assertEquals(bookingDto1.getStatus(), bookingDto2.getStatus());
+    }
+
+    @Test
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+    void getBookingByUserWaitingTest() throws InterruptedException {
+        LocalDateTime start = LocalDateTime.now();
+        userService.createUser(userDto1);
+        userService.createUser(userDto2);
+        itemService.createNewItem(itemDto1, 1);
+        BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
+        bookingService.addBooking(bookingInputDto, 2);
+        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "WAITING", 0, null);
+        BookingDto bookingDto1 = bookingDtos.get(0);
+        BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
         Assertions.assertEquals(bookingDto1.getStart(), bookingDto2.getStart());
         Assertions.assertEquals(bookingDto1.getEnd(), bookingDto2.getEnd());
@@ -334,7 +439,7 @@ public class BookingServiceTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getBookingByOwnerNullSizeTestTest() {
+    void getBookingByOwnerNullSizeTest() {
         LocalDateTime start = LocalDateTime.now();
         userService.createUser(userDto1);
         userService.createUser(userDto2);
@@ -344,6 +449,27 @@ public class BookingServiceTest {
         List<BookingDto> bookingDtos = bookingService.getBookingsByOwner(1, "FUTURE", 0, null);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusHours(1), start.plusHours(3), itemDto1, userDto2, Status.WAITING);
+        Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
+        Assertions.assertEquals(bookingDto1.getStart(), bookingDto2.getStart());
+        Assertions.assertEquals(bookingDto1.getEnd(), bookingDto2.getEnd());
+        Assertions.assertEquals(bookingDto1.getItem().getId(), bookingDto2.getItem().getId());
+        Assertions.assertEquals(bookingDto1.getBooker().getId(), bookingDto2.getBooker().getId());
+        Assertions.assertEquals(bookingDto1.getStatus(), bookingDto2.getStatus());
+    }
+
+    @Test
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+    void getBookingByOwnerPastTest() throws InterruptedException {
+        LocalDateTime start = LocalDateTime.now();
+        userService.createUser(userDto1);
+        userService.createUser(userDto2);
+        itemService.createNewItem(itemDto1, 1);
+        BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
+        bookingService.addBooking(bookingInputDto, 2);
+        TimeUnit.SECONDS.sleep(3);
+        List<BookingDto> bookingDtos = bookingService.getBookingsByOwner(1, "PAST", 0, null);
+        BookingDto bookingDto1 = bookingDtos.get(0);
+        BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
         Assertions.assertEquals(bookingDto1.getStart(), bookingDto2.getStart());
         Assertions.assertEquals(bookingDto1.getEnd(), bookingDto2.getEnd());
