@@ -183,6 +183,17 @@ public class ItemServiceTest {
     void getMyItemsNullSizeTest() {
         userService.createUser(userDto1);
         itemService.createNewItem(itemDto1, 1);
+        List<ItemDtoWithDate> itemDtoWithDates = itemService.getMyItems(1, 1, 1);
+        Assertions.assertEquals(itemDtoWithDates.get(0).getId(), itemDto1.getId());
+        Assertions.assertEquals(itemDtoWithDates.get(0).getName(), itemDto1.getName());
+        Assertions.assertEquals(itemDtoWithDates.get(0).getDescription(), itemDto1.getDescription());
+    }
+
+    @Test
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+    void getMyItemsWithPaginationTest() {
+        userService.createUser(userDto1);
+        itemService.createNewItem(itemDto1, 1);
         List<ItemDtoWithDate> itemDtoWithDates = itemService.getMyItems(1, 0, null);
         Assertions.assertEquals(itemDtoWithDates.get(0).getId(), itemDto1.getId());
         Assertions.assertEquals(itemDtoWithDates.get(0).getName(), itemDto1.getName());
