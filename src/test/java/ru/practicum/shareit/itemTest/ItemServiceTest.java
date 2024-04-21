@@ -227,7 +227,7 @@ public class ItemServiceTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getItemsForRentNullSizeTest() {
+    void getItemsForRentNotNullSizeTest() {
         userService.createUser(userDto1);
         itemService.createNewItem(itemDto1, 1);
         List<ItemDto> itemDto = itemService.getItemsForRent("item", 1, 2);
@@ -238,7 +238,18 @@ public class ItemServiceTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getItemsFroRentWrongPaginationTest() {
+    void getItemsForRentNullSizeTest() {
+        userService.createUser(userDto1);
+        itemService.createNewItem(itemDto1, 1);
+        List<ItemDto> itemDto = itemService.getItemsForRent("item", 0, null);
+        Assertions.assertEquals(itemDto.get(0).getId(), itemDto1.getId());
+        Assertions.assertEquals(itemDto.get(0).getName(), itemDto1.getName());
+        Assertions.assertEquals(itemDto.get(0).getDescription(), itemDto1.getDescription());
+    }
+
+    @Test
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+    void getItemsForRentWrongPaginationTest() {
         userService.createUser(userDto1);
         itemService.createNewItem(itemDto1, 1);
         PaginationException exception = Assertions.assertThrows(PaginationException.class,

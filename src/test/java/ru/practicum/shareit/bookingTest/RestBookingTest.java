@@ -181,5 +181,4 @@ public class RestBookingTest {
                 .andExpect(jsonPath("$.[0].booker.id", is(bookingDto.getBooker().getId()), Long.class))
                 .andExpect(jsonPath("$.[0].status", is(bookingDto.getStatus().toString())));
     }
-    // не понял про DTO тесты - направьте на путь истинный!!!!
 }

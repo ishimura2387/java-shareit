@@ -163,13 +163,13 @@ public class RequestServiceTest {
         userService.createUser(userDto1);
         userService.createUser(userDto2);
         ItemRequestDto itemRequestDto2 = new ItemRequestDto(2, "description 2 request", user2, LocalDateTime.now());
-        ItemRequestDto itemRequestDto3 = new ItemRequestDto(3, "description 3request", user, LocalDateTime.now());
+        ItemRequestDto itemRequestDto3 = new ItemRequestDto(3, "description 3 request", user, LocalDateTime.now());
         requestService.addRequest(1, itemRequestDto);
         requestService.addRequest(2, itemRequestDto2);
-        requestService.addRequest(1, itemRequestDto3);
+        requestService.addRequest(2, itemRequestDto3);
         List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllRequestOtherUsers(1, 1, 2);
-        Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto2.getId());
-        Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto2.getDescription());
+        Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto3.getId());
+        Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto3.getDescription());
     }
 
     @Test
@@ -185,5 +185,45 @@ public class RequestServiceTest {
         List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllRequestOtherUsers(1, 0, null);
         Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto2.getId());
         Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto2.getDescription());
+    }
+
+    @Test
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+    void getAllRequestNullSizeTest() {
+        userService.createUser(userDto1);
+        userService.createUser(userDto2);
+        ItemRequestDto itemRequestDto2 = new ItemRequestDto(2, "description 2 request", user2, LocalDateTime.now());
+        ItemRequestDto itemRequestDto3 = new ItemRequestDto(3, "description 3 request", user, LocalDateTime.now());
+        requestService.addRequest(1, itemRequestDto);
+        requestService.addRequest(2, itemRequestDto2);
+        requestService.addRequest(1, itemRequestDto3);
+        ItemDto itemDto3 = new ItemDto(3, "item 3", "description item 2",
+                false, null, 3);
+        itemService.createNewItem(itemDto1, 1);
+        itemService.createNewItem(itemDto2,2);
+        itemService.createNewItem(itemDto3,2);
+        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllRequestOtherUsers(2, 0, null);
+        Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto.getId());
+        Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto.getDescription());
+    }
+
+    @Test
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+    void getAllRequestNullSizeWithPaginationTest() {
+        userService.createUser(userDto1);
+        userService.createUser(userDto2);
+        ItemRequestDto itemRequestDto2 = new ItemRequestDto(2, "description 2 request", user2, LocalDateTime.now());
+        ItemRequestDto itemRequestDto3 = new ItemRequestDto(3, "description 3 request", user, LocalDateTime.now());
+        requestService.addRequest(1, itemRequestDto);
+        requestService.addRequest(2, itemRequestDto2);
+        requestService.addRequest(1, itemRequestDto3);
+        ItemDto itemDto3 = new ItemDto(3, "item 3", "description item 2",
+                false, null, 3);
+        itemService.createNewItem(itemDto1, 1);
+        itemService.createNewItem(itemDto2,2);
+        itemService.createNewItem(itemDto3,2);
+        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllRequestOtherUsers(2, 1, 1);
+        Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto3.getId());
+        Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto3.getDescription());
     }
 }
