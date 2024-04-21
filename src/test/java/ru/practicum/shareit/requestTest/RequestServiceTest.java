@@ -9,7 +9,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.exception.NullObjectException;
 import ru.practicum.shareit.exception.PaginationException;
 import ru.practicum.shareit.item.ItemDto;
-import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.request.ItemRequestDto;
 import ru.practicum.shareit.request.ItemRequestDtoOutput;
 import ru.practicum.shareit.request.RequestService;
