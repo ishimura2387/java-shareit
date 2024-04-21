@@ -9,6 +9,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.exception.NullObjectException;
 import ru.practicum.shareit.exception.PaginationException;
 import ru.practicum.shareit.item.ItemDto;
+import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.request.ItemRequestDto;
 import ru.practicum.shareit.request.ItemRequestDtoOutput;
 import ru.practicum.shareit.request.RequestService;
@@ -26,6 +27,7 @@ import java.util.List;
 public class RequestServiceTest {
     private final UserService userService;
     private final RequestService requestService;
+    private final ItemService itemService;
     private UserDto userDto1 = new UserDto(1, "user1", "user1@mail.ru");
     private UserDto userDto2 = new UserDto(2, "user2", "user2@mail.ru");
     private ItemDto itemDto1 = new ItemDto(1, "item 1", "description item 1",
@@ -60,7 +62,7 @@ public class RequestServiceTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getRewuestWrongUserTest() {
+    void getRequestWrongUserTest() {
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
                     requestService.getRequest(1, 1);
@@ -71,7 +73,7 @@ public class RequestServiceTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getRewuestWrongRequestTest() {
+    void getRequestWrongRequestTest() {
         userService.createUser(userDto1);
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
@@ -107,6 +109,16 @@ public class RequestServiceTest {
         Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto.getDescription());
         Assertions.assertEquals(requestDtoOutputs.get(1).getId(), itemRequestDto3.getId());
         Assertions.assertEquals(requestDtoOutputs.get(1).getDescription(), itemRequestDto3.getDescription());
+        ItemDto itemDto3 = new ItemDto(3, "item 3", "description item 2",
+                false, null, 3);
+        itemService.createNewItem(itemDto1, 1);
+        itemService.createNewItem(itemDto2,2);
+        itemService.createNewItem(itemDto3,2);
+        List<ItemRequestDtoOutput> requestDtoOutputs2 = requestService.getMyRequest(1);
+        Assertions.assertEquals(requestDtoOutputs2.get(0).getId(), itemRequestDto.getId());
+        Assertions.assertEquals(requestDtoOutputs2.get(0).getDescription(), itemRequestDto.getDescription());
+        Assertions.assertEquals(requestDtoOutputs2.get(1).getId(), itemRequestDto3.getId());
+        Assertions.assertEquals(requestDtoOutputs2.get(1).getDescription(), itemRequestDto3.getDescription());
     }
 
     @Test
@@ -156,6 +168,21 @@ public class RequestServiceTest {
         requestService.addRequest(2, itemRequestDto2);
         requestService.addRequest(1, itemRequestDto3);
         List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllRequestOtherUsers(1, 1, 2);
+        Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto2.getId());
+        Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto2.getDescription());
+    }
+
+    @Test
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+    void getAllRequestWithoutPaginationTest() {
+        userService.createUser(userDto1);
+        userService.createUser(userDto2);
+        ItemRequestDto itemRequestDto2 = new ItemRequestDto(2, "description 2 request", user2, LocalDateTime.now());
+        ItemRequestDto itemRequestDto3 = new ItemRequestDto(3, "description 3request", user, LocalDateTime.now());
+        requestService.addRequest(1, itemRequestDto);
+        requestService.addRequest(2, itemRequestDto2);
+        requestService.addRequest(1, itemRequestDto3);
+        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllRequestOtherUsers(1, 0, null);
         Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto2.getId());
         Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto2.getDescription());
     }
