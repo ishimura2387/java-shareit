@@ -9,6 +9,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.exception.NullObjectException;
 import ru.practicum.shareit.exception.PaginationException;
 import ru.practicum.shareit.item.ItemDto;
+import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.request.ItemRequestDto;
 import ru.practicum.shareit.request.ItemRequestDtoOutput;
 import ru.practicum.shareit.request.RequestService;
@@ -94,11 +95,11 @@ public class RequestServiceTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getMyRequestrTest() {
+    void getMyRequestTest() {
         userService.createUser(userDto1);
         userService.createUser(userDto2);
         ItemRequestDto itemRequestDto2 = new ItemRequestDto(2, "description 2 request", user2, LocalDateTime.now());
-        ItemRequestDto itemRequestDto3 = new ItemRequestDto(3, "description 3request", user, LocalDateTime.now());
+        ItemRequestDto itemRequestDto3 = new ItemRequestDto(3, "description 3 request", user, LocalDateTime.now());
         requestService.addRequest(1, itemRequestDto);
         requestService.addRequest(2, itemRequestDto2);
         requestService.addRequest(1, itemRequestDto3);
