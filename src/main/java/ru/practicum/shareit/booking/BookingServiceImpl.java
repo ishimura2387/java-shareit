@@ -100,22 +100,27 @@ public class BookingServiceImpl implements BookingService {
         if (size == null) {
             switch (state.toUpperCase()) {
                 case "CURRENT":
-                    bookings = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, LocalDateTime.now());
+                    bookings = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfter(userId,
+                            LocalDateTime.now(), Sort.by(Sort.Direction.ASC, "start"));
                     break;
                 case "PAST":
-                    bookings = bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
+                    bookings = bookingRepository.findAllByBookerIdAndEndBefore(userId, LocalDateTime.now(),
+                            Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "FUTURE":
-                    bookings = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
+                    bookings = bookingRepository.findAllByBookerIdAndStartAfter(userId, LocalDateTime.now(),
+                            Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "WAITING":
-                    bookings = bookingRepository.findAllByBookerIdAndStatusIsOrderByStartDesc(userId, Status.WAITING);
+                    bookings = bookingRepository.findAllByBookerIdAndStatusIs(userId, Status.WAITING,
+                            Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "REJECTED":
-                    bookings = bookingRepository.findAllByBookerIdAndStatusIsOrderByStartDesc(userId, Status.REJECTED);
+                    bookings = bookingRepository.findAllByBookerIdAndStatusIs(userId, Status.REJECTED,
+                            Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 default:
-                    bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
+                    bookings = bookingRepository.findAllByBookerId(userId, Sort.by(Sort.Direction.DESC, "start"));
                     break;
             }
         } else {
@@ -163,22 +168,28 @@ public class BookingServiceImpl implements BookingService {
         if (size == null) {
             switch (state.toUpperCase()) {
                 case "CURRENT":
-                    bookings = bookingRepository.findAllByOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(ownerId, LocalDateTime.now());
+                    bookings = bookingRepository.findAllByOwnerIdAndStartBeforeAndEndAfter(ownerId,
+                            LocalDateTime.now(), Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "PAST":
-                    bookings = bookingRepository.findAllByOwnerIdAndEndBeforeOrderByStartDesc(ownerId, LocalDateTime.now());
+                    bookings = bookingRepository.findAllByOwnerIdAndEndBefore(ownerId, LocalDateTime.now(),
+                            Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "FUTURE":
-                    bookings = bookingRepository.findAllByOwnerIdAndStartAfterOrderByStartDesc(ownerId, LocalDateTime.now());
+                    bookings = bookingRepository.findAllByOwnerIdAndStartAfter(ownerId, LocalDateTime.now(),
+                            Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "WAITING":
-                    bookings = bookingRepository.findAllByOwnerIdAndStatusIsOrderByStartDesc(ownerId, Status.WAITING);
+                    bookings = bookingRepository.findAllByOwnerIdAndStatusIs(ownerId, Status.WAITING,
+                            Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "REJECTED":
-                    bookings = bookingRepository.findAllByOwnerIdAndStatusIsOrderByStartDesc(ownerId, Status.REJECTED);
+                    bookings = bookingRepository.findAllByOwnerIdAndStatusIs(ownerId, Status.REJECTED,
+                            Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 default:
-                    bookings = bookingRepository.findAllByOwnerIdOrderByStartDesc(ownerId);
+                    bookings = bookingRepository.findAllByOwnerId(ownerId, Sort.by(Sort.Direction.DESC,
+                            "start"));
                     break;
             }
         } else {
@@ -209,6 +220,7 @@ public class BookingServiceImpl implements BookingService {
                     bookings = bookingRepository.findAllByOwnerIdAndStatusIs(ownerId, Status.REJECTED, pageable);
                     break;
                 default:
+                    pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "start"));
                     bookings = bookingRepository.findAllByOwnerId(ownerId, pageable);
                     break;
             }

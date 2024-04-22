@@ -104,7 +104,7 @@ public class ItemServiceImpl implements ItemService {
         List<ItemDtoWithDate> itemDtoWithDates = new ArrayList<>();
         List<Item> items = new ArrayList<>();
         if (size == null) {
-            items = itemRepository.getItemsByOwnerIdOrderById(id);
+            items = itemRepository.getItemsByOwnerId(id, Sort.by(Sort.Direction.ASC, "id"));
         } else {
             if (size < 0 || size == 0 || from < 0) {
                 throw new PaginationException("Ошибка пагинации!");
@@ -154,7 +154,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private ItemDtoWithDate setDate(Item item) {
-        List<Booking> bookings = bookingRepository.findAllByItemIdAndStatusIsOrderByStartDesc(item.getId(), Status.APPROVED);
+        List<Booking> bookings = bookingRepository.findAllByItemIdAndStatusIs(item.getId(), Status.APPROVED,
+                Sort.by(Sort.Direction.DESC, "start"));
         ItemDtoWithDate itemDtoWithDate = itemMapper.toItemDtoWithDate(item);
         LocalDateTime localDateTime = LocalDateTime.now();
         Optional<Booking> nextBooking = bookings.stream().filter(booking -> booking.getStart().isAfter(localDateTime)).reduce((a, b) -> b);

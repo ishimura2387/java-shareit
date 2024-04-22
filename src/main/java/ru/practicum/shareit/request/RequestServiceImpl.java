@@ -43,7 +43,7 @@ public class RequestServiceImpl implements RequestService {
     public List<ItemRequestDtoOutput> getMyRequest(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "пользователя на наличие в Storage! Пользователь не найден!"));
-        List<ItemRequest> requests = requestRepository.findAllByRequestorIdOrderByCreated(userId);
+        List<ItemRequest> requests = requestRepository.findAllByRequestorId(userId, Sort.by(Sort.Direction.ASC, "created"));
         List<Long> ids = new ArrayList<>();
         for (ItemRequest itemRequest : requests) {
             ids.add(itemRequest.getId());
@@ -127,7 +127,8 @@ public class RequestServiceImpl implements RequestService {
                 "пользователя на наличие в Storage! Пользователь не найден!"));
         ItemRequest itemRequest = requestRepository.findById(requestId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "запроса на наличие в Storage! Запрос не найден!"));
-        List<ItemDtoRequestAnswer> items = itemRepository.findAllByRequestIdOrderById(itemRequest.getId()).stream().map(item ->
+        List<ItemDtoRequestAnswer> items = itemRepository.findAllByRequestId(itemRequest.getId(),
+                Sort.by(Sort.Direction.ASC, "id")).stream().map(item ->
                 itemMapper.toItemDtoRequestAnswer(item)).collect(Collectors.toList());
         if (items.size() > 0) {
             return requestMapper.toItemRequestDtoOutput(itemRequest, items);
