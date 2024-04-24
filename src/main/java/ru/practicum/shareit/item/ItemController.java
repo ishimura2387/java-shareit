@@ -21,38 +21,38 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto createNewComment(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId,
+    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId,
                                        @Valid @RequestBody CommentDto commentDto) {
-        return itemService.createNewComment(commentDto, userId, itemId);
+        return itemService.addComment(commentDto, userId, itemId);
     }
 
     @PostMapping
-    public ItemDto createNewItem(@RequestHeader("X-Sharer-User-Id") long userId, @Valid @RequestBody ItemDto itemDto) {
-        return itemService.createNewItem(itemDto, userId);
+    public ItemDto add(@RequestHeader("X-Sharer-User-Id") long userId, @Valid @RequestBody ItemDto itemDto) {
+        return itemService.add(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId, @RequestBody ItemDto itemDto) {
+    public ItemDto update(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId, @RequestBody ItemDto itemDto) {
         itemDto.setId(itemId);
-        return itemService.updateItem(itemDto, userId, itemId);
+        return itemService.update(itemDto, userId, itemId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDtoWithDate getItem(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
-        return itemService.getItem(itemId, userId);
+    public ItemDtoWithDate get(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.get(itemId, userId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getItemsForRent(@RequestParam String text,
+    public List<ItemDto> search(@RequestParam String text,
                                          @RequestParam(defaultValue = "0") Integer from,
                                          @RequestParam(required = false) Integer size) {
-        return itemService.getItemsForRent(text, from, size);
+        return itemService.search(text, from, size);
     }
 
     @GetMapping
-    public List<ItemDtoWithDate> getMyItems(@RequestHeader("X-Sharer-User-Id") long userId,
+    public List<ItemDtoWithDate> getAll(@RequestHeader("X-Sharer-User-Id") long userId,
                                             @RequestParam(defaultValue = "0") Integer from,
                                             @RequestParam(required = false) Integer size) {
-        return itemService.getMyItems(userId, from, size);
+        return itemService.getAll(userId, from, size);
     }
 }

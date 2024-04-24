@@ -69,7 +69,7 @@ public class RestItemTest {
 
     @Test
     void createCommentTest() throws Exception {
-        when(itemService.createNewComment(any(), any(Long.class), any(Long.class)))
+        when(itemService.addComment(any(), any(Long.class), any(Long.class)))
                 .thenReturn(commentDto);
         mvc.perform(post("/items/1/comment")
                         .content(mapper.writeValueAsString(commentDto))
@@ -88,7 +88,7 @@ public class RestItemTest {
 
     @Test
     void createItemTest() throws Exception {
-        when(itemService.createNewItem(any(), any(Long.class)))
+        when(itemService.add(any(), any(Long.class)))
                 .thenReturn(itemDto);
         mvc.perform(post("/items")
                         .content(mapper.writeValueAsString(itemDto))
@@ -106,7 +106,7 @@ public class RestItemTest {
 
     @Test
     void updateItemTest() throws Exception {
-        when(itemService.updateItem(any(), any(Long.class), any(Long.class)))
+        when(itemService.update(any(), any(Long.class), any(Long.class)))
                 .thenReturn(itemDto);
         mvc.perform(patch("/items/1")
                         .content(mapper.writeValueAsString(itemDto))
@@ -124,7 +124,7 @@ public class RestItemTest {
 
     @Test
     void getItemTest() throws Exception {
-        when(itemService.getItem(any(Long.class), any(Long.class)))
+        when(itemService.get(any(Long.class), any(Long.class)))
                 .thenReturn(itemDtoWithDate);
         mvc.perform(get("/items/1")
                         .content(mapper.writeValueAsString(itemDto))
@@ -143,7 +143,7 @@ public class RestItemTest {
     @Test
     void getItemsForRentTest() throws Exception {
         itemDtos.add(itemDto);
-        when(itemService.getItemsForRent(any(String.class), any(Integer.class), nullable(Integer.class)))
+        when(itemService.search(any(String.class), any(Integer.class), nullable(Integer.class)))
                 .thenReturn(List.of(itemDto));
         mvc.perform(get("/items/search?text=description")
                         .content(mapper.writeValueAsString(itemDtos))
@@ -162,7 +162,7 @@ public class RestItemTest {
     @Test
     void getMyItemsTest() throws Exception {
         itemDtoWithDates.add(itemDtoWithDate);
-        when(itemService.getMyItems(any(Long.class), any(Integer.class), nullable(Integer.class)))
+        when(itemService.getAll(any(Long.class), any(Integer.class), nullable(Integer.class)))
                 .thenReturn(List.of(itemDtoWithDate));
         mvc.perform(get("/items")
                         .content(mapper.writeValueAsString(itemDtoWithDates))

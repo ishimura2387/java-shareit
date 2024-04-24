@@ -2,19 +2,19 @@ package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NullObjectException;
 import ru.practicum.shareit.exception.PaginationException;
+import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemDtoRequestAnswer;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.UserRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class RequestServiceImpl implements RequestService {
     private final ItemMapper itemMapper;
 
     @Override
-    public ItemRequestDto addRequest(long userId, ItemRequestDto itemRequestDto) {
+    public ItemRequestDto add(long userId, ItemRequestDto itemRequestDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "пользователя на наличие в Storage! Пользователь не найден!"));
         ItemRequest itemRequest = requestMapper.toItemRequest(itemRequestDto, user);
@@ -40,7 +40,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<ItemRequestDtoOutput> getMyRequest(long userId) {
+    public List<ItemRequestDtoOutput> getAll(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "пользователя на наличие в Storage! Пользователь не найден!"));
         List<ItemRequest> requests = requestRepository.findAllByRequestorId(userId, Sort.by(Sort.Direction.ASC, "created"));
@@ -65,7 +65,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<ItemRequestDtoOutput> getAllRequestOtherUsers(long userId, Integer from, Integer size) {
+    public List<ItemRequestDtoOutput> getAllOther(long userId, Integer from, Integer size) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "пользователя на наличие в Storage! Пользователь не найден!"));
         List<ItemRequestDtoOutput> itemRequestDtoOutputs = new ArrayList<>();
@@ -122,7 +122,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public ItemRequestDtoOutput getRequest(long userId, long requestId) {
+    public ItemRequestDtoOutput get(long userId, long requestId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "пользователя на наличие в Storage! Пользователь не найден!"));
         ItemRequest itemRequest = requestRepository.findById(requestId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +

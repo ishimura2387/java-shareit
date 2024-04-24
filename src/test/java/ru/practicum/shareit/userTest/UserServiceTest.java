@@ -24,19 +24,19 @@ public class UserServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void userFindAllTest() {
-        userService.createUser(userDto1);
-        Assertions.assertEquals(userService.findAllUsers().size(), 1);
-        userService.createUser(userDto2);
-        Assertions.assertEquals(userService.findAllUsers().size(), 2);
-        userService.createUser(userDto3);
-        Assertions.assertEquals(userService.findAllUsers().size(), 3);
+        userService.add(userDto1);
+        Assertions.assertEquals(userService.getAll().size(), 1);
+        userService.add(userDto2);
+        Assertions.assertEquals(userService.getAll().size(), 2);
+        userService.add(userDto3);
+        Assertions.assertEquals(userService.getAll().size(), 3);
     }
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void userAddAndGetTest() {
-        userService.createUser(userDto1);
-        UserDto userDto = userService.getUser(1);
+        userService.add(userDto1);
+        UserDto userDto = userService.get(1);
         Assertions.assertEquals(userDto.getId(), userDto.getId());
         Assertions.assertEquals(userDto.getName(), userDto.getName());
         Assertions.assertEquals(userDto.getEmail(), userDto.getEmail());
@@ -47,7 +47,7 @@ public class UserServiceTest {
     void getWrongUsertTest() {
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    userService.getUser(1);
+                    userService.get(1);
                 },
                 "Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!");
         Assertions.assertEquals("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!", exception.getMessage());
@@ -58,7 +58,7 @@ public class UserServiceTest {
     void updateWrongUsertTest() {
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    userService.updateUser(new UserDto(1, "nameUpdate", "emailUpdate@mail.ru"));
+                    userService.update(new UserDto(1, "nameUpdate", "emailUpdate@mail.ru"));
                 },
                 "Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!");
         Assertions.assertEquals("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!", exception.getMessage());
@@ -67,9 +67,9 @@ public class UserServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void updateUserTest() {
-        userService.createUser(userDto1);
-        userService.updateUser(new UserDto(1, "nameUpdate", "emailUpdate@mail.ru"));
-        UserDto userDto = userService.getUser(1);
+        userService.add(userDto1);
+        userService.update(new UserDto(1, "nameUpdate", "emailUpdate@mail.ru"));
+        UserDto userDto = userService.get(1);
         Assertions.assertEquals(userDto.getId(), 1);
         Assertions.assertEquals(userDto.getName(), "nameUpdate");
         Assertions.assertEquals(userDto.getEmail(), "emailUpdate@mail.ru");
@@ -78,11 +78,11 @@ public class UserServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void deleteFindAllTest() {
-        userService.createUser(userDto1);
-        Assertions.assertEquals(userService.findAllUsers().size(), 1);
-        userService.createUser(userDto2);
-        Assertions.assertEquals(userService.findAllUsers().size(), 2);
-        userService.deleteUser(1);
-        Assertions.assertEquals(userService.findAllUsers().size(), 1);
+        userService.add(userDto1);
+        Assertions.assertEquals(userService.getAll().size(), 1);
+        userService.add(userDto2);
+        Assertions.assertEquals(userService.getAll().size(), 2);
+        userService.delete(1);
+        Assertions.assertEquals(userService.getAll().size(), 1);
     }
 }

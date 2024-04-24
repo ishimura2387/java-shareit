@@ -62,7 +62,7 @@ public class RestRequestTest {
 
     @Test
     void createItemRequestTest() throws Exception {
-        when(requestService.addRequest(any(Long.class), any()))
+        when(requestService.add(any(Long.class), any()))
                 .thenReturn(itemRequestDto);
         mvc.perform(post("/requests")
                         .content(mapper.writeValueAsString(itemRequestDto))
@@ -84,7 +84,7 @@ public class RestRequestTest {
     @Test
     void getMyRequestsTest() throws Exception {
         itemRequestDtoOutputList.add(itemRequestDtoOutput);
-        when(requestService.getMyRequest(any(Long.class)))
+        when(requestService.getAll(any(Long.class)))
                 .thenReturn(List.of(itemRequestDtoOutput));
         mvc.perform(get("/requests")
                         .content(mapper.writeValueAsString(itemRequestDtoOutputList))
@@ -103,7 +103,7 @@ public class RestRequestTest {
     @Test
     void getItemRequestsTest() throws Exception {
         itemRequestDtoOutputList.add(itemRequestDtoOutput);
-        when(requestService.getAllRequestOtherUsers(any(Long.class), any(Integer.class), nullable(Integer.class)))
+        when(requestService.getAllOther(any(Long.class), any(Integer.class), nullable(Integer.class)))
                 .thenReturn(List.of(itemRequestDtoOutput));
         mvc.perform(get("/requests/all")
                         .content(mapper.writeValueAsString(itemRequestDtoOutputList))
@@ -121,7 +121,7 @@ public class RestRequestTest {
 
     @Test
     void getItemRequestTest() throws Exception {
-        when(requestService.getRequest(any(Long.class), any(Long.class)))
+        when(requestService.get(any(Long.class), any(Long.class)))
                 .thenReturn(itemRequestDtoOutput);
         mvc.perform(get("/requests/1")
                         .content(mapper.writeValueAsString(itemRequestDtoOutput))

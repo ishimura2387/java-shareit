@@ -25,41 +25,29 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByBookerIdAndStatusIs(long id, Status status, Pageable pageable);
 
-    @Query("select b from Booking b where b.booker.id = ?1 and b.start < ?2 and b.end > ?2")
-    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfter(long id, LocalDateTime dateTime, Sort sort);
+    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfter(long id, LocalDateTime start, LocalDateTime end, Sort sort);
 
-    @Query("select b from Booking b where b.booker.id = ?1 and b.start < ?2 and b.end > ?2")
-    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfterWithPagination(long id, LocalDateTime dateTime, Pageable pageable);
+    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfter(long id, LocalDateTime start, LocalDateTime end, Pageable pageable);
 
-    @Query("select b from Booking b where b.item.owner.id = ?1")
-    List<Booking> findAllByOwnerId(long id, Sort sort);
+    List<Booking> findAllByItem_OwnerId(long id, Sort sort);
 
-    @Query("select b from Booking b where b.item.owner.id = ?1")
-    List<Booking> findAllByOwnerId(long id, Pageable pageable);
+    List<Booking> findAllByItem_OwnerId(long id, Pageable pageable);
 
-    @Query("select b from Booking b where b.item.owner.id = ?1 and b.end < ?2")
-    List<Booking> findAllByOwnerIdAndEndBefore(long id, LocalDateTime dateTime, Sort sort);
+    List<Booking> findAllByItem_OwnerIdAndAndEndBefore(long id, LocalDateTime dateTime, Sort sort);
 
-    @Query("select b from Booking b where b.item.owner.id = ?1 and b.end < ?2")
-    List<Booking> findAllByOwnerIdAndEndBefore(long id, LocalDateTime dateTime, Pageable pageable);
+    List<Booking> findAllByItem_OwnerIdAndAndEndBefore(long id, LocalDateTime dateTime, Pageable pageable);
 
-    @Query("select b from Booking b where b.item.owner.id = ?1 and b.start > ?2")
-    List<Booking> findAllByOwnerIdAndStartAfter(long id, LocalDateTime dateTime, Sort sort);
+    List<Booking> findAllByItem_OwnerIdAndStartAfter(long id, LocalDateTime dateTime, Sort sort);
 
-    @Query("select b from Booking b where b.item.owner.id = ?1 and b.start > ?2")
-    List<Booking> findAllByOwnerIdAndStartAfter(long id, LocalDateTime dateTime, Pageable pageable);
+    List<Booking> findAllByItem_OwnerIdAndStartAfter(long id, LocalDateTime dateTime, Pageable pageable);
 
-    @Query("select b from Booking b where b.item.owner.id = ?1 and b.status = ?2")
-    List<Booking> findAllByOwnerIdAndStatusIs(long id, Status status, Sort sort);
+    List<Booking> findAllByItem_OwnerIdAndStatusIs(long id, Status status, Sort sort);
 
-    @Query("select b from Booking b where b.item.owner.id = ?1 and b.status = ?2")
-    List<Booking> findAllByOwnerIdAndStatusIs(long id, Status status, Pageable pageable);
+    List<Booking> findAllByItem_OwnerIdAndStatusIs(long id, Status status, Pageable pageable);
 
-    @Query("select b from Booking b where b.item.owner.id = ?1 and b.start < ?2 and b.end > ?2")
-    List<Booking> findAllByOwnerIdAndStartBeforeAndEndAfter(long id, LocalDateTime dateTime, Sort sort);
+    List<Booking> findAllByItem_OwnerIdAndStartBeforeAndEndAfter(long id, LocalDateTime start, LocalDateTime end, Sort sort);
 
-    @Query("select b from Booking b where b.item.owner.id = ?1 and b.start < ?2 and b.end > ?2")
-    List<Booking> findAllByOwnerIdAndStartBeforeAndEndAfterWithPagination(long id, LocalDateTime dateTime, Pageable pageable);
+    List<Booking> findAllByItem_OwnerIdAndStartBeforeAndEndAfter(long id, LocalDateTime start, LocalDateTime end, Pageable pageable);
 
     List<Booking> findAllByItemIdAndStatusIs(long itemId, Status status, Sort sort);
 

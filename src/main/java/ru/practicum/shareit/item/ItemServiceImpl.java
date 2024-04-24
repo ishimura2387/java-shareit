@@ -39,7 +39,7 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public CommentDto createNewComment(CommentDto commentDto, long userId, long itemId) {
+    public CommentDto addComment(CommentDto commentDto, long userId, long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "вещи на наличие в Storage! Вещь не найдена!"));
         User user = userRepository.findById(userId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
@@ -55,7 +55,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto createNewItem(ItemDto itemDto, long userId) {
+    public ItemDto add(ItemDto itemDto, long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "пользователя на наличие в Storage! Пользователь не найден!"));
         Item item = itemMapper.toItem(itemDto);
@@ -71,7 +71,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto updateItem(ItemDto itemDto, long userId, long itemId) {
+    public ItemDto update(ItemDto itemDto, long userId, long itemId) {
         Item oldItem = itemRepository.findByIdAndOwnerId(itemId, userId);
         Item item = itemMapper.updateItem(itemDto, oldItem);
         item.setOwner(oldItem.getOwner());
@@ -80,7 +80,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDtoWithDate getItem(long itemId, long userId) {
+    public ItemDtoWithDate get(long itemId, long userId) {
         log.debug("Обработка запроса GET /items.Запрошена вещь c id: {}", itemId);
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "вещи на наличие в Storage! Вещь не найдена!"));
@@ -97,7 +97,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoWithDate> getMyItems(long id, Integer from, Integer size) {
+    public List<ItemDtoWithDate> getAll(long id, Integer from, Integer size) {
         User user = userRepository.findById(id).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "пользователя на наличие в Storage! Пользователь не найден!"));
         log.debug("Обработка запроса GET /items.Запрошены вещи пользователя: {}", id);
@@ -129,7 +129,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemsForRent(String text, Integer from, Integer size) {
+    public List<ItemDto> search(String text, Integer from, Integer size) {
         log.debug("Обработка запроса GET /items.Запрошены вещи c описанием: {}", text);
         if (text.isEmpty()) {
             return Collections.emptyList();
@@ -148,7 +148,7 @@ public class ItemServiceImpl implements ItemService {
                 page = from / size;
             }
             Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
-            items = itemRepository.getItemsForRentWithPagination(text, pageable);
+            items = itemRepository.getItemsForRent(text, pageable);
         }
         return items.stream().map(item -> itemMapper.fromItem(item)).collect(Collectors.toList());
     }

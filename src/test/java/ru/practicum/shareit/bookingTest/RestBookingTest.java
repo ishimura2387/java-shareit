@@ -75,7 +75,7 @@ public class RestBookingTest {
 
     @Test
     void createNewBookingTest() throws Exception {
-        when(bookingService.addBooking(any(), anyLong()))
+        when(bookingService.add(any(), anyLong()))
                 .thenReturn(bookingDto);
         mvc.perform(post("/bookings")
                         .content(mapper.writeValueAsString(bookingInputDto))
@@ -95,7 +95,7 @@ public class RestBookingTest {
 
     @Test
     void setBookingStatusTest() throws Exception {
-        when(bookingService.setBookingStatus(any(Long.class), any(Boolean.class), any(Long.class)))
+        when(bookingService.setStatus(any(Long.class), any(Boolean.class), any(Long.class)))
                 .thenReturn(bookingDto);
         mvc.perform(patch("/bookings/1")
                         .content(mapper.writeValueAsString(bookingDto))
@@ -116,7 +116,7 @@ public class RestBookingTest {
 
     @Test
     void getBookingTest() throws Exception {
-        when(bookingService.getBooking(any(Long.class), any(Long.class)))
+        when(bookingService.get(any(Long.class), any(Long.class)))
                 .thenReturn(bookingDto);
         mvc.perform(get("/bookings/1")
                         .content(mapper.writeValueAsString(bookingDto))
@@ -137,7 +137,7 @@ public class RestBookingTest {
     @Test
     void getBookingsByUserTest() throws Exception {
         bookingDtos.add(bookingDto);
-        when(bookingService.getBookingsByUser(any(Long.class), any(String.class),
+        when(bookingService.getAllByUser(any(Long.class), any(String.class),
                 any(Integer.class), nullable(Integer.class)))
                 .thenReturn(List.of(bookingDto));
         mvc.perform(get("/bookings")
@@ -161,7 +161,7 @@ public class RestBookingTest {
     @Test
     void getBookingsByOwnerTest() throws Exception {
         bookingDtos.add(bookingDto);
-        when(bookingService.getBookingsByOwner(any(Long.class), any(String.class),
+        when(bookingService.getAllByOwner(any(Long.class), any(String.class),
                 any(Integer.class), nullable(Integer.class)))
                 .thenReturn(List.of(bookingDto));
         mvc.perform(get("/bookings/owner")

@@ -52,7 +52,7 @@ public class RestUserTest {
     @Test
     void findAllUsersTest() throws Exception {
         userDtoList.add(userDto);
-        when(userService.findAllUsers())
+        when(userService.getAll())
                 .thenReturn(userDtoList);
         mvc.perform(get("/users")
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -67,7 +67,7 @@ public class RestUserTest {
 
     @Test
     void createUser() throws Exception {
-        when(userService.createUser(any()))
+        when(userService.add(any()))
                 .thenReturn(userDto);
 
         mvc.perform(post("/users")
@@ -84,7 +84,7 @@ public class RestUserTest {
 
     @Test
     void updateUser() throws Exception {
-        when(userService.updateUser(any()))
+        when(userService.update(any()))
                 .thenReturn(userDto);
         mvc.perform(patch("/users/1")
                         .content(mapper.writeValueAsString(userDto))
@@ -106,7 +106,7 @@ public class RestUserTest {
 
     @Test
     void getUser() throws Exception {
-        when(userService.getUser(any(Long.class)))
+        when(userService.get(any(Long.class)))
                 .thenReturn(userDto);
         mvc.perform(get("/users/1"))
                 .andExpect(status().isOk())

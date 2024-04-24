@@ -51,7 +51,7 @@ public class BookingServiceTest {
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(2));
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    bookingService.addBooking(bookingInputDto, 1);
+                    bookingService.add(bookingInputDto, 1);
                 },
                 "Ошибка проверки вещи на наличие в Storage! Вещь не найдена!");
         Assertions.assertEquals("Ошибка проверки вещи на наличие в Storage! Вещь не найдена!", exception.getMessage());
@@ -61,12 +61,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void wrongBookerAddBookingTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(2));
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    bookingService.addBooking(bookingInputDto, 2);
+                    bookingService.add(bookingInputDto, 2);
                 },
                 "Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!");
         Assertions.assertEquals("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!", exception.getMessage());
@@ -76,14 +76,14 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void wrongAvailableAddBookingTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
-        itemService.createNewItem(itemDto2, 2);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
+        itemService.add(itemDto2, 2);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 2, start.plusHours(1), start.plusHours(2));
         AvailableException exception = Assertions.assertThrows(AvailableException.class,
                 () -> {
-                    bookingService.addBooking(bookingInputDto, 1);
+                    bookingService.add(bookingInputDto, 1);
                 },
                 "Вещь недоступна для бронирования!");
         Assertions.assertEquals("Вещь недоступна для бронирования!", exception.getMessage());
@@ -93,12 +93,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void ownerBookItemAddBookingTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(2));
         OwnerException exception = Assertions.assertThrows(OwnerException.class,
                 () -> {
-                    bookingService.addBooking(bookingInputDto, 1);
+                    bookingService.add(bookingInputDto, 1);
                 },
                 "Пользователь не может забронировать свою вещь!");
         Assertions.assertEquals("Пользователь не может забронировать свою вещь!", exception.getMessage());
@@ -108,36 +108,36 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void validTimeBookingTestTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(2), start.plusHours(1));
         BookingInputDto bookingInputDto2 = new BookingInputDto(2, 1, start.minusHours(1), start.plusHours(2));
         BookingInputDto bookingInputDto3 = new BookingInputDto(3, 1, start.plusHours(1), start.plusHours(1));
         TimeBookingValidationException exception = Assertions.assertThrows(TimeBookingValidationException.class,
                 () -> {
-                    bookingService.addBooking(bookingInputDto, 2);
+                    bookingService.add(bookingInputDto, 2);
                 },
                 "Время бронирования не корректно!");
         Assertions.assertEquals("Время бронирования не корректно!", exception.getMessage());
         TimeBookingValidationException exception2 = Assertions.assertThrows(TimeBookingValidationException.class,
                 () -> {
-                    bookingService.addBooking(bookingInputDto2, 2);
+                    bookingService.add(bookingInputDto2, 2);
                 },
                 "Время бронирования не корректно!");
         Assertions.assertEquals("Время бронирования не корректно!", exception2.getMessage());
         TimeBookingValidationException exception3 = Assertions.assertThrows(TimeBookingValidationException.class,
                 () -> {
-                    bookingService.addBooking(bookingInputDto3, 2);
+                    bookingService.add(bookingInputDto3, 2);
                 },
                 "Время бронирования не корректно!");
         Assertions.assertEquals("Время бронирования не корректно!", exception3.getMessage());
         BookingInputDto bookingInputDto4 = new BookingInputDto(4, 1, start.plusHours(1), start.plusHours(3));
         BookingInputDto bookingInputDto5 = new BookingInputDto(5, 1, start.plusHours(2), start.plusHours(4));
-        bookingService.addBooking(bookingInputDto4, 2);
+        bookingService.add(bookingInputDto4, 2);
         TimeBookingValidationException exception4 = Assertions.assertThrows(TimeBookingValidationException.class,
                 () -> {
-                    bookingService.addBooking(bookingInputDto5, 2);
+                    bookingService.add(bookingInputDto5, 2);
                 },
                 "На данное время уже есть бронирование!");
         Assertions.assertEquals("На данное время уже есть бронирование!", exception4.getMessage());
@@ -147,12 +147,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void addAndGetOwnerTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto1 = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(3));
-        bookingService.addBooking(bookingInputDto1, 2);
-        BookingDto bookingDto1 = bookingService.getBooking(1, 1);
+        bookingService.add(bookingInputDto1, 2);
+        BookingDto bookingDto1 = bookingService.get(1, 1);
         BookingDto bookingDto2 = new BookingDto(1, start.plusHours(1), start.plusHours(3), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
         Assertions.assertEquals(bookingDto1.getStart(), bookingDto2.getStart());
@@ -165,11 +165,11 @@ public class BookingServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getErrorBookingTest() {
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
+        userService.add(userDto1);
+        userService.add(userDto2);
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    bookingService.getBooking(2, 2);
+                    bookingService.get(2, 2);
                 },
                 "Ошибка проверки бронирования на наличие в Storage! Бронирование не найдено!");
         Assertions.assertEquals("Ошибка проверки бронирования на наличие в Storage! Бронирование не найдено!", exception.getMessage());
@@ -178,11 +178,11 @@ public class BookingServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void setStatusErrorBookingTest() {
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
+        userService.add(userDto1);
+        userService.add(userDto2);
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    bookingService.setBookingStatus(2, true, 2);
+                    bookingService.setStatus(2, true, 2);
                 },
                 "Ошибка проверки бронирования на наличие в Storage! Бронирование не найдено!");
         Assertions.assertEquals("Ошибка проверки бронирования на наличие в Storage! Бронирование не найдено!", exception.getMessage());
@@ -192,15 +192,15 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void setStatusNoApprovedExc() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(3));
-        bookingService.addBooking(bookingInputDto, 2);
-        bookingService.setBookingStatus(1, true, 1);
+        bookingService.add(bookingInputDto, 2);
+        bookingService.setStatus(1, true, 1);
         NoOneApprovedException exception = Assertions.assertThrows(NoOneApprovedException.class,
                 () -> {
-                    bookingService.setBookingStatus(1, true, 1);
+                    bookingService.setStatus(1, true, 1);
                 },
                 "Статус уже подтвержден!");
         Assertions.assertEquals("Статус уже подтвержден!", exception.getMessage());
@@ -210,14 +210,14 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void setStatusNoOwnerTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(3));
-        bookingService.addBooking(bookingInputDto, 2);
+        bookingService.add(bookingInputDto, 2);
         SetStatusBookingException exception = Assertions.assertThrows(SetStatusBookingException.class,
                 () -> {
-                    bookingService.setBookingStatus(1, true, 2);
+                    bookingService.setStatus(1, true, 2);
                 },
                 "Подтверждение бронирования доступно только владельцу вещи!");
         Assertions.assertEquals("Подтверждение бронирования доступно только владельцу вещи!", exception.getMessage());
@@ -227,13 +227,13 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void setStatusTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(3));
-        bookingService.addBooking(bookingInputDto, 2);
-        bookingService.setBookingStatus(1, true, 1);
-        BookingDto bookingDto1 = bookingService.getBooking(1, 1);
+        bookingService.add(bookingInputDto, 2);
+        bookingService.setStatus(1, true, 1);
+        BookingDto bookingDto1 = bookingService.get(1, 1);
         BookingDto bookingDto2 = new BookingDto(1, start.plusHours(1), start.plusHours(3), itemDto1, userDto2, Status.APPROVED);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
         Assertions.assertEquals(bookingDto1.getStart(), bookingDto2.getStart());
@@ -248,7 +248,7 @@ public class BookingServiceTest {
     void getBookingByUserWrongBookingTest() {
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    bookingService.getBookingsByUser(1, "CURRENT", 1, 2);
+                    bookingService.getAllByUser(1, "CURRENT", 1, 2);
                 },
                 "Ошибка проверки пользователя на наличие в Storage! Бронирование не найдено!");
         Assertions.assertEquals("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!", exception.getMessage());
@@ -257,10 +257,10 @@ public class BookingServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserWrongStateTest() {
-        userService.createUser(userDto1);
+        userService.add(userDto1);
         StateException exception = Assertions.assertThrows(StateException.class,
                 () -> {
-                    bookingService.getBookingsByUser(1, "abrakadabra", 1, 2);
+                    bookingService.getAllByUser(1, "abrakadabra", 1, 2);
                 },
                 "Unknown state: abrakadabra");
         Assertions.assertEquals("Unknown state: abrakadabra", exception.getMessage());
@@ -270,12 +270,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserFutureTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(3));
-        bookingService.addBooking(bookingInputDto, 2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "FUTURE", 0, null);
+        bookingService.add(bookingInputDto, 2);
+        List<BookingDto> bookingDtos = bookingService.getAllByUser(2, "FUTURE", 0, null);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusHours(1), start.plusHours(3), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -290,13 +290,13 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserCurrentTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(20));
-        bookingService.addBooking(bookingInputDto, 2);
+        bookingService.add(bookingInputDto, 2);
         TimeUnit.SECONDS.sleep(2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "CURRENT", 0, null);
+        List<BookingDto> bookingDtos = bookingService.getAllByUser(2, "CURRENT", 0, null);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(20), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -311,13 +311,13 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserPastTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
-        bookingService.addBooking(bookingInputDto, 2);
+        bookingService.add(bookingInputDto, 2);
         TimeUnit.SECONDS.sleep(3);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "PAST", 0, null);
+        List<BookingDto> bookingDtos = bookingService.getAllByUser(2, "PAST", 0, null);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -332,13 +332,13 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserRejectedTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
-        bookingService.addBooking(bookingInputDto, 2);
-        bookingService.setBookingStatus(1, false, 1);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "REJECTED", 0, null);
+        bookingService.add(bookingInputDto, 2);
+        bookingService.setStatus(1, false, 1);
+        List<BookingDto> bookingDtos = bookingService.getAllByUser(2, "REJECTED", 0, null);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.REJECTED);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -353,12 +353,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserDefaultTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
-        bookingService.addBooking(bookingInputDto, 2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "ALL", 0, null);
+        bookingService.add(bookingInputDto, 2);
+        List<BookingDto> bookingDtos = bookingService.getAllByUser(2, "ALL", 0, null);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -373,12 +373,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserWaitingTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
-        bookingService.addBooking(bookingInputDto, 2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "WAITING", 0, null);
+        bookingService.add(bookingInputDto, 2);
+        List<BookingDto> bookingDtos = bookingService.getAllByUser(2, "WAITING", 0, null);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -392,22 +392,22 @@ public class BookingServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserErrorPagination() {
-        userService.createUser(userDto1);
+        userService.add(userDto1);
         PaginationException exception = Assertions.assertThrows(PaginationException.class,
                 () -> {
-                    bookingService.getBookingsByUser(1, "CURRENT", 1, -1);
+                    bookingService.getAllByUser(1, "CURRENT", 1, -1);
                 },
                 "Ошибка пагинации!");
         Assertions.assertEquals("Ошибка пагинации!", exception.getMessage());
         PaginationException exception2 = Assertions.assertThrows(PaginationException.class,
                 () -> {
-                    bookingService.getBookingsByUser(1, "CURRENT", 1, 0);
+                    bookingService.getAllByUser(1, "CURRENT", 1, 0);
                 },
                 "Ошибка пагинации!");
         Assertions.assertEquals("Ошибка пагинации!", exception2.getMessage());
         PaginationException exception3 = Assertions.assertThrows(PaginationException.class,
                 () -> {
-                    bookingService.getBookingsByUser(1, "CURRENT", -1, 2);
+                    bookingService.getAllByUser(1, "CURRENT", -1, 2);
                 },
                 "Ошибка пагинации!");
         Assertions.assertEquals("Ошибка пагинации!", exception3.getMessage());
@@ -418,7 +418,7 @@ public class BookingServiceTest {
     void getBookingByOwnerWrongBookingTest() {
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    bookingService.getBookingsByOwner(1, "CURRENT", 1, 2);
+                    bookingService.getAllByOwner(1, "CURRENT", 1, 2);
                 },
                 "Ошибка проверки пользователя на наличие в Storage! Бронирование не найдено!");
         Assertions.assertEquals("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!", exception.getMessage());
@@ -427,10 +427,10 @@ public class BookingServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerWrongStateTest() {
-        userService.createUser(userDto1);
+        userService.add(userDto1);
         StateException exception = Assertions.assertThrows(StateException.class,
                 () -> {
-                    bookingService.getBookingsByOwner(1, "abrakadabra", 1, 2);
+                    bookingService.getAllByOwner(1, "abrakadabra", 1, 2);
                 },
                 "Unknown state: abrakadabra");
         Assertions.assertEquals("Unknown state: abrakadabra", exception.getMessage());
@@ -440,12 +440,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerFutureTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(3));
-        bookingService.addBooking(bookingInputDto, 2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByOwner(1, "FUTURE", 0, null);
+        bookingService.add(bookingInputDto, 2);
+        List<BookingDto> bookingDtos = bookingService.getAllByOwner(1, "FUTURE", 0, null);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusHours(1), start.plusHours(3), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -460,13 +460,13 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerPastTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
-        bookingService.addBooking(bookingInputDto, 2);
+        bookingService.add(bookingInputDto, 2);
         TimeUnit.SECONDS.sleep(3);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByOwner(1, "PAST", 0, null);
+        List<BookingDto> bookingDtos = bookingService.getAllByOwner(1, "PAST", 0, null);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -481,13 +481,13 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerCurrentTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(10));
-        bookingService.addBooking(bookingInputDto, 2);
+        bookingService.add(bookingInputDto, 2);
         TimeUnit.SECONDS.sleep(2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByOwner(1, "CURRENT", 0, null);
+        List<BookingDto> bookingDtos = bookingService.getAllByOwner(1, "CURRENT", 0, null);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(10), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -502,12 +502,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerWaitingTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(10));
-        bookingService.addBooking(bookingInputDto, 2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByOwner(1, "WAITING", 0, null);
+        bookingService.add(bookingInputDto, 2);
+        List<BookingDto> bookingDtos = bookingService.getAllByOwner(1, "WAITING", 0, null);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(10), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -522,13 +522,13 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerRejectedTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(10));
-        bookingService.addBooking(bookingInputDto, 2);
-        bookingService.setBookingStatus(1, false, 1);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByOwner(1, "REJECTED", 0, null);
+        bookingService.add(bookingInputDto, 2);
+        bookingService.setStatus(1, false, 1);
+        List<BookingDto> bookingDtos = bookingService.getAllByOwner(1, "REJECTED", 0, null);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(10), itemDto1, userDto2, Status.REJECTED);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -543,12 +543,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerDefaultTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(10));
-        bookingService.addBooking(bookingInputDto, 2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByOwner(1, "ALL", 0, null);
+        bookingService.add(bookingInputDto, 2);
+        List<BookingDto> bookingDtos = bookingService.getAllByOwner(1, "ALL", 0, null);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(10), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -562,22 +562,22 @@ public class BookingServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerErrorPagination() {
-        userService.createUser(userDto1);
+        userService.add(userDto1);
         PaginationException exception = Assertions.assertThrows(PaginationException.class,
                 () -> {
-                    bookingService.getBookingsByOwner(1, "CURRENT", 1, -1);
+                    bookingService.getAllByOwner(1, "CURRENT", 1, -1);
                 },
                 "Ошибка пагинации!");
         Assertions.assertEquals("Ошибка пагинации!", exception.getMessage());
         PaginationException exception2 = Assertions.assertThrows(PaginationException.class,
                 () -> {
-                    bookingService.getBookingsByOwner(1, "CURRENT", 1, 0);
+                    bookingService.getAllByOwner(1, "CURRENT", 1, 0);
                 },
                 "Ошибка пагинации!");
         Assertions.assertEquals("Ошибка пагинации!", exception2.getMessage());
         PaginationException exception3 = Assertions.assertThrows(PaginationException.class,
                 () -> {
-                    bookingService.getBookingsByOwner(1, "CURRENT", -1, 2);
+                    bookingService.getAllByOwner(1, "CURRENT", -1, 2);
                 },
                 "Ошибка пагинации!");
         Assertions.assertEquals("Ошибка пагинации!", exception3.getMessage());
@@ -587,13 +587,13 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserWithPaginationCurrentTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(20));
-        bookingService.addBooking(bookingInputDto, 2);
+        bookingService.add(bookingInputDto, 2);
         TimeUnit.SECONDS.sleep(2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "CURRENT", 1, 1);
+        List<BookingDto> bookingDtos = bookingService.getAllByUser(2, "CURRENT", 1, 1);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(20), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -608,13 +608,13 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserWithPaginationPastTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
-        bookingService.addBooking(bookingInputDto, 2);
+        bookingService.add(bookingInputDto, 2);
         TimeUnit.SECONDS.sleep(3);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "PAST", 1, 1);
+        List<BookingDto> bookingDtos = bookingService.getAllByUser(2, "PAST", 1, 1);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -629,12 +629,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserWithPAginationFutureTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(3));
-        bookingService.addBooking(bookingInputDto, 2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "FUTURE", 1, 1);
+        bookingService.add(bookingInputDto, 2);
+        List<BookingDto> bookingDtos = bookingService.getAllByUser(2, "FUTURE", 1, 1);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusHours(1), start.plusHours(3), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -649,13 +649,13 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserWithPAginationRejectedTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
-        bookingService.addBooking(bookingInputDto, 2);
-        bookingService.setBookingStatus(1, false, 1);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "REJECTED", 1, 1);
+        bookingService.add(bookingInputDto, 2);
+        bookingService.setStatus(1, false, 1);
+        List<BookingDto> bookingDtos = bookingService.getAllByUser(2, "REJECTED", 1, 1);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.REJECTED);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -670,12 +670,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserWithPAginationDefaultTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
-        bookingService.addBooking(bookingInputDto, 2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "ALL", 1, 1);
+        bookingService.add(bookingInputDto, 2);
+        List<BookingDto> bookingDtos = bookingService.getAllByUser(2, "ALL", 1, 1);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -690,12 +690,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserWithPaginationWaitingTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
-        bookingService.addBooking(bookingInputDto, 2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByUser(2, "WAITING", 1, 1);
+        bookingService.add(bookingInputDto, 2);
+        List<BookingDto> bookingDtos = bookingService.getAllByUser(2, "WAITING", 1, 1);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -710,12 +710,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerWithPAginationFutureTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(3));
-        bookingService.addBooking(bookingInputDto, 2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByOwner(1, "FUTURE", 1, 1);
+        bookingService.add(bookingInputDto, 2);
+        List<BookingDto> bookingDtos = bookingService.getAllByOwner(1, "FUTURE", 1, 1);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusHours(1), start.plusHours(3), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -730,13 +730,13 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerWithPAginationPastTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
-        bookingService.addBooking(bookingInputDto, 2);
+        bookingService.add(bookingInputDto, 2);
         TimeUnit.SECONDS.sleep(3);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByOwner(1, "PAST", 1, 1);
+        List<BookingDto> bookingDtos = bookingService.getAllByOwner(1, "PAST", 1, 1);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -751,13 +751,13 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerWithPaginationCurrentTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(10));
-        bookingService.addBooking(bookingInputDto, 2);
+        bookingService.add(bookingInputDto, 2);
         TimeUnit.SECONDS.sleep(2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByOwner(1, "CURRENT", 1, 1);
+        List<BookingDto> bookingDtos = bookingService.getAllByOwner(1, "CURRENT", 1, 1);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(10), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -772,12 +772,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerWithPAginationWaitingTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(10));
-        bookingService.addBooking(bookingInputDto, 2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByOwner(1, "WAITING", 1, 1);
+        bookingService.add(bookingInputDto, 2);
+        List<BookingDto> bookingDtos = bookingService.getAllByOwner(1, "WAITING", 1, 1);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(10), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -792,13 +792,13 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerWithPAginationRejectedTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(10));
-        bookingService.addBooking(bookingInputDto, 2);
-        bookingService.setBookingStatus(1, false, 1);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByOwner(1, "REJECTED", 1, 1);
+        bookingService.add(bookingInputDto, 2);
+        bookingService.setStatus(1, false, 1);
+        List<BookingDto> bookingDtos = bookingService.getAllByOwner(1, "REJECTED", 1, 1);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(10), itemDto1, userDto2, Status.REJECTED);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());
@@ -813,12 +813,12 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerWithPaginationDefaultTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(10));
-        bookingService.addBooking(bookingInputDto, 2);
-        List<BookingDto> bookingDtos = bookingService.getBookingsByOwner(1, "ALL", 1, 1);
+        bookingService.add(bookingInputDto, 2);
+        List<BookingDto> bookingDtos = bookingService.getAllByOwner(1, "ALL", 1, 1);
         BookingDto bookingDto1 = bookingDtos.get(0);
         BookingDto bookingDto2 = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(10), itemDto1, userDto2, Status.WAITING);
         Assertions.assertEquals(bookingDto1.getId(), bookingDto2.getId());

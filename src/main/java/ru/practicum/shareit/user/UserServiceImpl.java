@@ -15,21 +15,21 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public List<UserDto> findAllUsers() {
+    public List<UserDto> getAll() {
         List<User> users = userRepository.findAll();
         log.debug("Обработка запроса GET /users; Текущее количество пользователей: {}",
                 users.size());
         return users.stream().map(user -> userMapper.fromUser(user)).collect(Collectors.toList());
     }
 
-    public UserDto createUser(UserDto userDto) {
+    public UserDto add(UserDto userDto) {
         User user = userMapper.toUser(userDto);
         log.debug("Обработка запроса POST /users. Создан пользователь: {}", user);
         userDto = userMapper.fromUser(userRepository.save(user));
         return userDto;
     }
 
-    public UserDto updateUser(UserDto userDto) {
+    public UserDto update(UserDto userDto) {
         long id = userDto.getId();
         User userOld = userRepository.findById(id).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "пользователя на наличие в Storage! Пользователь не найден!"));
@@ -38,14 +38,14 @@ public class UserServiceImpl implements UserService {
         return userMapper.fromUser(userRepository.save(user));
     }
 
-    public void deleteUser(long userId) {
+    public void delete(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "пользователя на наличие в Storage! Пользователь не найден!"));
         log.debug("Обработка запроса DELETE /users.Пользователь удален: {}", userId);
         userRepository.deleteById(userId);
     }
 
-    public UserDto getUser(long id) {
+    public UserDto get(long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "пользователя на наличие в Storage! Пользователь не найден!"));
         log.debug("Обработка запроса GET /users.Запрошен пользователь c id: {}", id);

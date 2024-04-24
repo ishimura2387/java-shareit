@@ -14,25 +14,25 @@ public class ItemRequestController {
     private final RequestService requestServiceImpl;
 
     @PostMapping
-    public ItemRequestDto createNewRequest(@RequestHeader("X-Sharer-User-Id") long userId, @Valid @RequestBody
+    public ItemRequestDto add(@RequestHeader("X-Sharer-User-Id") long userId, @Valid @RequestBody
     ItemRequestDto itemRequestDto) {
-        return requestServiceImpl.addRequest(userId, itemRequestDto);
+        return requestServiceImpl.add(userId, itemRequestDto);
     }
 
     @GetMapping
-    public List<ItemRequestDtoOutput> getMyRequests(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return requestServiceImpl.getMyRequest(userId);
+    public List<ItemRequestDtoOutput> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
+        return requestServiceImpl.getAll(userId);
     }
 
     @GetMapping("/all")
-    public List<ItemRequestDtoOutput> getAllItemRequests(@RequestHeader("X-Sharer-User-Id") long userId,
+    public List<ItemRequestDtoOutput> getAllOther(@RequestHeader("X-Sharer-User-Id") long userId,
                                                          @RequestParam(defaultValue = "0") Integer from,
                                                          @RequestParam(required = false) Integer size) {
-        return requestServiceImpl.getAllRequestOtherUsers(userId, from, size);
+        return requestServiceImpl.getAllOther(userId, from, size);
     }
 
     @GetMapping("{requestId}")
-    public ItemRequestDtoOutput getItemRequest(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long requestId) {
-        return requestServiceImpl.getRequest(userId, requestId);
+    public ItemRequestDtoOutput get(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long requestId) {
+        return requestServiceImpl.get(userId, requestId);
     }
 }

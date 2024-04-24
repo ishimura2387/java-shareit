@@ -43,14 +43,14 @@ public class ItemServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void wrongAddCommentTest() {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(2));
-        bookingService.addBooking(bookingInputDto, 2);
+        bookingService.add(bookingInputDto, 2);
         CommentException exception = Assertions.assertThrows(CommentException.class,
                 () -> {
-                    itemService.createNewComment(commentDto, 2, 1);
+                    itemService.addComment(commentDto, 2, 1);
                 },
                 "Чтобы оставлять отзывы нужно иметь завершенное бронирование вещи!!");
         Assertions.assertEquals("Чтобы оставлять отзывы нужно иметь завершенное бронирование вещи!", exception.getMessage());
@@ -60,15 +60,15 @@ public class ItemServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void wrongUserAddCommentTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
-        bookingService.addBooking(bookingInputDto, 2);
+        bookingService.add(bookingInputDto, 2);
         TimeUnit.SECONDS.sleep(3);
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    itemService.createNewComment(commentDto, 3, 1);
+                    itemService.addComment(commentDto, 3, 1);
                 },
                 "Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!");
         Assertions.assertEquals("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!", exception.getMessage());
@@ -78,15 +78,15 @@ public class ItemServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void wrongItemAddCommentTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
-        bookingService.addBooking(bookingInputDto, 2);
+        bookingService.add(bookingInputDto, 2);
         TimeUnit.SECONDS.sleep(3);
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    itemService.createNewComment(commentDto, 1, 2);
+                    itemService.addComment(commentDto, 1, 2);
                 },
                 "Ошибка проверки вещи на наличие в Storage! Вещь не найдена!");
         Assertions.assertEquals("Ошибка проверки вещи на наличие в Storage! Вещь не найдена!", exception.getMessage());
@@ -96,13 +96,13 @@ public class ItemServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void createCommentTest() throws InterruptedException {
         LocalDateTime start = LocalDateTime.now();
-        userService.createUser(userDto1);
-        userService.createUser(userDto2);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        userService.add(userDto2);
+        itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
-        bookingService.addBooking(bookingInputDto, 2);
+        bookingService.add(bookingInputDto, 2);
         TimeUnit.SECONDS.sleep(3);
-        CommentDto commentDto1 = itemService.createNewComment(commentDto, 2, 1);
+        CommentDto commentDto1 = itemService.addComment(commentDto, 2, 1);
         CommentDto commentDto2 = new CommentDto(1, "text comment 1", "user2", timeStart);
         Assertions.assertEquals(commentDto1.getId(), commentDto2.getId());
         Assertions.assertEquals(commentDto1.getText(), commentDto2.getText());
@@ -114,7 +114,7 @@ public class ItemServiceTest {
     void createItemWrongUserTest() {
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    itemService.createNewItem(itemDto1, 1);
+                    itemService.add(itemDto1, 1);
                 },
                 "Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!");
         Assertions.assertEquals("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!", exception.getMessage());
@@ -123,10 +123,10 @@ public class ItemServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void createItemWrongRequestTest() {
-        userService.createUser(userDto1);
+        userService.add(userDto1);
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    itemService.createNewItem(itemDto2, 1);
+                    itemService.add(itemDto2, 1);
                 },
                 "Ошибка проверки запроса на наличие в Storage! Запрос не найден!");
         Assertions.assertEquals("Ошибка проверки запроса на наличие в Storage! Запрос не найден!", exception.getMessage());
@@ -135,9 +135,9 @@ public class ItemServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void createAndGetItemTest() {
-        userService.createUser(userDto1);
-        itemService.createNewItem(itemDto1, 1);
-        ItemDtoWithDate itemDto = itemService.getItem(1, 1);
+        userService.add(userDto1);
+        itemService.add(itemDto1, 1);
+        ItemDtoWithDate itemDto = itemService.get(1, 1);
         Assertions.assertEquals(itemDto.getId(), itemDto1.getId());
         Assertions.assertEquals(itemDto.getName(), itemDto1.getName());
         Assertions.assertEquals(itemDto.getDescription(), itemDto1.getDescription());
@@ -146,10 +146,10 @@ public class ItemServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void updateItemTest() {
-        userService.createUser(userDto1);
-        ItemDto itemDto = itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        ItemDto itemDto = itemService.add(itemDto1, 1);
         ItemDto newItemDto = new ItemDto(1, null, "description new item", null, null, 0);
-        ItemDto itemDto2 = itemService.updateItem(newItemDto, 1, 1);
+        ItemDto itemDto2 = itemService.update(newItemDto, 1, 1);
         Assertions.assertEquals(itemDto.getId(), itemDto2.getId());
         Assertions.assertEquals(itemDto.getName(), itemDto2.getName());
         Assertions.assertNotEquals(itemDto.getDescription(), itemDto2.getDescription());
@@ -161,7 +161,7 @@ public class ItemServiceTest {
     void getItemWrongItemTest() {
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    itemService.getItem(1, 1);
+                    itemService.get(1, 1);
                 },
                 "Ошибка проверки вещи на наличие в Storage! Вещь не найдена!");
         Assertions.assertEquals("Ошибка проверки вещи на наличие в Storage! Вещь не найдена!", exception.getMessage());
@@ -172,7 +172,7 @@ public class ItemServiceTest {
     void getMyItemsWrongUserTest() {
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    itemService.getMyItems(1, 1, 2);
+                    itemService.getAll(1, 1, 2);
                 },
                 "Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!");
         Assertions.assertEquals("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!", exception.getMessage());
@@ -181,9 +181,9 @@ public class ItemServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getMyItemsNullSizeTest() {
-        userService.createUser(userDto1);
-        itemService.createNewItem(itemDto1, 1);
-        List<ItemDtoWithDate> itemDtoWithDates = itemService.getMyItems(1, 1, 1);
+        userService.add(userDto1);
+        itemService.add(itemDto1, 1);
+        List<ItemDtoWithDate> itemDtoWithDates = itemService.getAll(1, 1, 1);
         Assertions.assertEquals(itemDtoWithDates.get(0).getId(), itemDto1.getId());
         Assertions.assertEquals(itemDtoWithDates.get(0).getName(), itemDto1.getName());
         Assertions.assertEquals(itemDtoWithDates.get(0).getDescription(), itemDto1.getDescription());
@@ -192,9 +192,9 @@ public class ItemServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getMyItemsWithPaginationTest() {
-        userService.createUser(userDto1);
-        itemService.createNewItem(itemDto1, 1);
-        List<ItemDtoWithDate> itemDtoWithDates = itemService.getMyItems(1, 0, null);
+        userService.add(userDto1);
+        itemService.add(itemDto1, 1);
+        List<ItemDtoWithDate> itemDtoWithDates = itemService.getAll(1, 0, null);
         Assertions.assertEquals(itemDtoWithDates.get(0).getId(), itemDto1.getId());
         Assertions.assertEquals(itemDtoWithDates.get(0).getName(), itemDto1.getName());
         Assertions.assertEquals(itemDtoWithDates.get(0).getDescription(), itemDto1.getDescription());
@@ -203,23 +203,23 @@ public class ItemServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getMyItemsWrongPaginationTest() {
-        userService.createUser(userDto1);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        itemService.add(itemDto1, 1);
         PaginationException exception = Assertions.assertThrows(PaginationException.class,
                 () -> {
-                    itemService.getMyItems(1, 1, -1);
+                    itemService.getAll(1, 1, -1);
                 },
                 "Ошибка пагинации!");
         Assertions.assertEquals("Ошибка пагинации!", exception.getMessage());
         PaginationException exception2 = Assertions.assertThrows(PaginationException.class,
                 () -> {
-                    itemService.getMyItems(1, 1, 0);
+                    itemService.getAll(1, 1, 0);
                 },
                 "Ошибка пагинации!");
         Assertions.assertEquals("Ошибка пагинации!", exception2.getMessage());
         PaginationException exception3 = Assertions.assertThrows(PaginationException.class,
                 () -> {
-                    itemService.getMyItems(1, -1, 2);
+                    itemService.getAll(1, -1, 2);
                 },
                 "Ошибка пагинации!");
         Assertions.assertEquals("Ошибка пагинации!", exception3.getMessage());
@@ -228,9 +228,9 @@ public class ItemServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getItemsForRentNotNullSizeTest() {
-        userService.createUser(userDto1);
-        itemService.createNewItem(itemDto1, 1);
-        List<ItemDto> itemDto = itemService.getItemsForRent("item", 1, 2);
+        userService.add(userDto1);
+        itemService.add(itemDto1, 1);
+        List<ItemDto> itemDto = itemService.search("item", 1, 2);
         Assertions.assertEquals(itemDto.get(0).getId(), itemDto1.getId());
         Assertions.assertEquals(itemDto.get(0).getName(), itemDto1.getName());
         Assertions.assertEquals(itemDto.get(0).getDescription(), itemDto1.getDescription());
@@ -239,9 +239,9 @@ public class ItemServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getItemsForRentNullSizeTest() {
-        userService.createUser(userDto1);
-        itemService.createNewItem(itemDto1, 1);
-        List<ItemDto> itemDto = itemService.getItemsForRent("item", 0, null);
+        userService.add(userDto1);
+        itemService.add(itemDto1, 1);
+        List<ItemDto> itemDto = itemService.search("item", 0, null);
         Assertions.assertEquals(itemDto.get(0).getId(), itemDto1.getId());
         Assertions.assertEquals(itemDto.get(0).getName(), itemDto1.getName());
         Assertions.assertEquals(itemDto.get(0).getDescription(), itemDto1.getDescription());
@@ -250,23 +250,23 @@ public class ItemServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getItemsForRentWrongPaginationTest() {
-        userService.createUser(userDto1);
-        itemService.createNewItem(itemDto1, 1);
+        userService.add(userDto1);
+        itemService.add(itemDto1, 1);
         PaginationException exception = Assertions.assertThrows(PaginationException.class,
                 () -> {
-                    itemService.getItemsForRent("item", 1, -1);
+                    itemService.search("item", 1, -1);
                 },
                 "Ошибка пагинации!");
         Assertions.assertEquals("Ошибка пагинации!", exception.getMessage());
         PaginationException exception2 = Assertions.assertThrows(PaginationException.class,
                 () -> {
-                    itemService.getItemsForRent("item", 1, 0);
+                    itemService.search("item", 1, 0);
                 },
                 "Ошибка пагинации!");
         Assertions.assertEquals("Ошибка пагинации!", exception2.getMessage());
         PaginationException exception3 = Assertions.assertThrows(PaginationException.class,
                 () -> {
-                    itemService.getItemsForRent("item", -1, 2);
+                    itemService.search("item", -1, 2);
                 },
                 "Ошибка пагинации!");
         Assertions.assertEquals("Ошибка пагинации!", exception3.getMessage());
