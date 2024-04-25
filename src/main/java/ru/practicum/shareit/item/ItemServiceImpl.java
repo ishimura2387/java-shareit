@@ -97,27 +97,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoWithDate> getAll(long id, Integer from, Integer size) {
+    public List<ItemDtoWithDate> getAllSort(long id, Sort sort) {
         User user = userRepository.findById(id).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "пользователя на наличие в Storage! Пользователь не найден!"));
         log.debug("Обработка запроса GET /items.Запрошены вещи пользователя: {}", id);
         List<ItemDtoWithDate> itemDtoWithDates = new ArrayList<>();
         List<Item> items = new ArrayList<>();
-        if (size == null) {
-            items = itemRepository.getItemsByOwnerId(id, Sort.by(Sort.Direction.ASC, "id"));
-        } else {
-            if (size < 0 || size == 0 || from < 0) {
-                throw new PaginationException("Ошибка пагинации!");
-            }
-            int page;
-            if (from.longValue() == size.longValue()) {
-                page = from / size - 1;
-            } else {
-                page = from / size;
-            }
-            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
-            items = itemRepository.getItemsByOwnerId(id, pageable);
-        }
+        items = itemRepository.getItemsByOwnerId(id, Sort.by(Sort.Direction.ASC, "id"));
         for (Item item : items) {
             ItemDtoWithDate itemDtoWithDate = setDate(item);
             List<CommentDto> comments = commentRepository.findAllByItemId(item.getId()).stream().map(comment ->
@@ -129,27 +115,54 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(String text, Integer from, Integer size) {
+    public List<ItemDtoWithDate> getAllPageable(long id, Pageable pageable) {
+        User user = userRepository.findById(id).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
+                "пользователя на наличие в Storage! Пользователь не найден!"));
+        log.debug("Обработка запроса GET /items.Запрошены вещи пользователя: {}", id);
+        if (pageable.getPageSize() < 0 || pageable.getPageSize() == 0 || pageable.getPageNumber() <= 0 ) {
+            throw new PaginationException("Ошибка пагинации!");
+        }
+        if (pageable.getPageNumber() == 0) {
+            pageable = PageRequest.of(1, pageable.getPageSize(), pageable.getSort());
+        }
+        List<ItemDtoWithDate> itemDtoWithDates = new ArrayList<>();
+        List<Item> items = new ArrayList<>();
+        items = itemRepository.getItemsByOwnerId(id, pageable);
+        for (Item item : items) {
+            ItemDtoWithDate itemDtoWithDate = setDate(item);
+            List<CommentDto> comments = commentRepository.findAllByItemId(item.getId()).stream().map(comment ->
+                    commentMapper.fromComment(comment)).collect(Collectors.toList());
+            itemDtoWithDate.setComments(comments);
+            itemDtoWithDates.add(itemDtoWithDate);
+        }
+        return itemDtoWithDates;
+    }
+
+    @Override
+    public List<ItemDto> searchSort(String text, Sort sort) {
         log.debug("Обработка запроса GET /items.Запрошены вещи c описанием: {}", text);
         if (text.isEmpty()) {
             return Collections.emptyList();
         }
         List<Item> items = new ArrayList<>();
-        if (size == null) {
-            items = itemRepository.getItemsForRent(text);
-        } else {
-            if (size < 0 || size == 0 || from < 0) {
-                throw new PaginationException("Ошибка пагинации!");
-            }
-            int page;
-            if (from.longValue() == size.longValue()) {
-                page = from / size - 1;
-            } else {
-                page = from / size;
-            }
-            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
-            items = itemRepository.getItemsForRent(text, pageable);
+        items = itemRepository.getItemsForRent(text);
+        return items.stream().map(item -> itemMapper.fromItem(item)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ItemDto> searchPageable(String text, Pageable pageable) {
+        log.debug("Обработка запроса GET /items.Запрошены вещи c описанием: {}", text);
+        if (text.isEmpty()) {
+            return Collections.emptyList();
         }
+        List<Item> items = new ArrayList<>();
+        if (pageable.getPageSize() < 0 || pageable.getPageSize() == 0 || pageable.getPageNumber() <= 0) {
+            throw new PaginationException("Ошибка пагинации!");
+        }
+        if (pageable.getPageNumber() == 0) {
+            pageable = PageRequest.of(1, pageable.getPageSize(), pageable.getSort());
+        }
+        items = itemRepository.getItemsForRent(text, pageable);
         return items.stream().map(item -> itemMapper.fromItem(item)).collect(Collectors.toList());
     }
 

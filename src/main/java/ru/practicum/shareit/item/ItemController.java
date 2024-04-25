@@ -1,6 +1,9 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +25,7 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId,
-                                       @Valid @RequestBody CommentDto commentDto) {
+                                 @Valid @RequestBody CommentDto commentDto) {
         return itemService.addComment(commentDto, userId, itemId);
     }
 
@@ -44,15 +47,29 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text,
-                                         @RequestParam(defaultValue = "0") Integer from,
-                                         @RequestParam(required = false) Integer size) {
-        return itemService.search(text, from, size);
+                                @RequestParam(defaultValue = "0") Integer from,
+                                @RequestParam(required = false) Integer size) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        if (size == null) {
+            return itemService.searchSort(text, sort);
+        } else {
+            int page = from / size;
+            Pageable pageable = PageRequest.of(page, size, sort);
+            return itemService.searchPageable(text, pageable);
+        }
     }
 
     @GetMapping
     public List<ItemDtoWithDate> getAll(@RequestHeader("X-Sharer-User-Id") long userId,
-                                            @RequestParam(defaultValue = "0") Integer from,
-                                            @RequestParam(required = false) Integer size) {
-        return itemService.getAll(userId, from, size);
+                                        @RequestParam(defaultValue = "0") Integer from,
+                                        @RequestParam(required = false) Integer size) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        if (size == null) {
+            return itemService.getAllSort(userId, sort);
+        } else {
+            int page = from / size;
+            Pageable pageable = PageRequest.of(page, size, sort);
+            return itemService.getAllPageable(userId, pageable);
+        }
     }
 }

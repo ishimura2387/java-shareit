@@ -1,5 +1,8 @@
 package ru.practicum.shareit.request;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 import java.util.List;
 
 public interface RequestService {
@@ -7,7 +10,9 @@ public interface RequestService {
 
     List<ItemRequestDtoOutput> getAll(long userId);
 
-    List<ItemRequestDtoOutput> getAllOther(long userId, Integer from, Integer size);
+    List<ItemRequestDtoOutput> getAllOtherSort(long userId, Sort sort);
+
+    List<ItemRequestDtoOutput> getAllOtherPageable(long userId, Pageable pageable);
 
     ItemRequestDtoOutput get(long userId, long requestId);
 }

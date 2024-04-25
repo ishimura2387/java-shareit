@@ -65,58 +65,60 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<ItemRequestDtoOutput> getAllOther(long userId, Integer from, Integer size) {
+    public List<ItemRequestDtoOutput> getAllOtherSort(long userId, Sort sort) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "пользователя на наличие в Storage! Пользователь не найден!"));
         List<ItemRequestDtoOutput> itemRequestDtoOutputs = new ArrayList<>();
         List<ItemRequest> request = new ArrayList<>();
-        if (size == null) {
-            request = requestRepository.findAllByRequestorIdNotZeroSize(userId).stream().skip(from).collect(Collectors.toList());
-            List<Long> ids = new ArrayList<>();
+        request = requestRepository.findAllByRequestorIdNotZeroSize(userId).stream().collect(Collectors.toList());
+        List<Long> ids = new ArrayList<>();
+        for (ItemRequest itemRequest : request) {
+            ids.add(itemRequest.getId());
+        }
+        List<Item> items = itemRepository.findAllByRequestIdIn(ids);
+        if (items.size() > 0) {
             for (ItemRequest itemRequest : request) {
-                ids.add(itemRequest.getId());
-            }
-            List<Item> items = itemRepository.findAllByRequestIdIn(ids);
-            if (items.size() > 0) {
-                for (ItemRequest itemRequest : request) {
-                    List<ItemDtoRequestAnswer> itemsDto = items.stream().filter(item -> item.getRequest().getId() == itemRequest.getId())
-                            .map(item -> itemMapper.toItemDtoRequestAnswer(item)).collect(Collectors.toList());
-                    ItemRequestDtoOutput itemDtoRequestAnswer = requestMapper.toItemRequestDtoOutput(itemRequest, itemsDto);
-                    itemRequestDtoOutputs.add(itemDtoRequestAnswer);
-                }
-            } else {
-                itemRequestDtoOutputs = request.stream().map(itemRequest -> requestMapper.toItemRequestDtoOutputNullRequest(itemRequest))
-                        .collect(Collectors.toList());
+                List<ItemDtoRequestAnswer> itemsDto = items.stream().filter(item -> item.getRequest().getId() == itemRequest.getId())
+                        .map(item -> itemMapper.toItemDtoRequestAnswer(item)).collect(Collectors.toList());
+                ItemRequestDtoOutput itemDtoRequestAnswer = requestMapper.toItemRequestDtoOutput(itemRequest, itemsDto);
+                itemRequestDtoOutputs.add(itemDtoRequestAnswer);
             }
         } else {
-            if (size < 0 || size == 0 || from < 0) {
-                throw new PaginationException("Ошибка пагинации!");
-            }
-            int page;
-            if (from.longValue() == size.longValue()) {
-                page = from / size - 1;
-            } else {
-                page = from / size;
-            }
-            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "created"));
-            Page<ItemRequest> pages = requestRepository.findAllByRequestorIdNot(userId, pageable);
-            request = pages.get().collect(Collectors.toList());
-            List<Long> ids = new ArrayList<>();
+            itemRequestDtoOutputs = request.stream().map(itemRequest -> requestMapper.toItemRequestDtoOutputNullRequest(itemRequest))
+                    .collect(Collectors.toList());
+        }
+        return itemRequestDtoOutputs;
+    }
+
+    @Override
+    public List<ItemRequestDtoOutput> getAllOtherPageable(long userId, Pageable pageable) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
+                "пользователя на наличие в Storage! Пользователь не найден!"));
+        List<ItemRequestDtoOutput> itemRequestDtoOutputs = new ArrayList<>();
+        List<ItemRequest> request = new ArrayList<>();
+        if (pageable.getPageSize() < 0 || pageable.getPageSize() == 0 || pageable.getPageNumber() <= 0) {
+            throw new PaginationException("Ошибка пагинации!");
+        }
+        if (pageable.getPageNumber() == 0) {
+            pageable = PageRequest.of(1, pageable.getPageSize(), pageable.getSort());
+        }
+        Page<ItemRequest> pages = requestRepository.findAllByRequestorIdNot(userId, pageable);
+        request = pages.get().collect(Collectors.toList());
+        List<Long> ids = new ArrayList<>();
+        for (ItemRequest itemRequest : request) {
+            ids.add(itemRequest.getId());
+        }
+        List<Item> items = itemRepository.findAllByRequestIdIn(ids);
+        if (items.size() > 0) {
             for (ItemRequest itemRequest : request) {
-                ids.add(itemRequest.getId());
+                List<ItemDtoRequestAnswer> itemsDto = items.stream().filter(item -> item.getRequest().getId() == itemRequest.getId())
+                        .map(item -> itemMapper.toItemDtoRequestAnswer(item)).collect(Collectors.toList());
+                ItemRequestDtoOutput itemDtoRequestAnswer = requestMapper.toItemRequestDtoOutput(itemRequest, itemsDto);
+                itemRequestDtoOutputs.add(itemDtoRequestAnswer);
             }
-            List<Item> items = itemRepository.findAllByRequestIdIn(ids);
-            if (items.size() > 0) {
-                for (ItemRequest itemRequest : request) {
-                    List<ItemDtoRequestAnswer> itemsDto = items.stream().filter(item -> item.getRequest().getId() == itemRequest.getId())
-                            .map(item -> itemMapper.toItemDtoRequestAnswer(item)).collect(Collectors.toList());
-                    ItemRequestDtoOutput itemDtoRequestAnswer = requestMapper.toItemRequestDtoOutput(itemRequest, itemsDto);
-                    itemRequestDtoOutputs.add(itemDtoRequestAnswer);
-                }
-            } else {
-                itemRequestDtoOutputs = request.stream().map(itemRequest -> requestMapper.toItemRequestDtoOutputNullRequest(itemRequest))
-                        .collect(Collectors.toList());
-            }
+        } else {
+            itemRequestDtoOutputs = request.stream().map(itemRequest -> requestMapper.toItemRequestDtoOutputNullRequest(itemRequest))
+                    .collect(Collectors.toList());
         }
         return itemRequestDtoOutputs;
     }
