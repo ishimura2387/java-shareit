@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.BookingInputDto;
 import ru.practicum.shareit.booking.BookingService;
@@ -172,7 +175,7 @@ public class ItemServiceTest {
     void getMyItemsWrongUserTest() {
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    itemService.getAll(1, 1, 2);
+                    itemService.getAllSort(1, Sort.by(Sort.Direction.DESC, "id"));
                 },
                 "Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!");
         Assertions.assertEquals("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!", exception.getMessage());
@@ -183,7 +186,7 @@ public class ItemServiceTest {
     void getMyItemsNullSizeTest() {
         userService.add(userDto1);
         itemService.add(itemDto1, 1);
-        List<ItemDtoWithDate> itemDtoWithDates = itemService.getAll(1, 1, 1);
+        List<ItemDtoWithDate> itemDtoWithDates = itemService.getAllSort(1, Sort.by(Sort.Direction.DESC, "id"));
         Assertions.assertEquals(itemDtoWithDates.get(0).getId(), itemDto1.getId());
         Assertions.assertEquals(itemDtoWithDates.get(0).getName(), itemDto1.getName());
         Assertions.assertEquals(itemDtoWithDates.get(0).getDescription(), itemDto1.getDescription());
@@ -194,7 +197,9 @@ public class ItemServiceTest {
     void getMyItemsWithPaginationTest() {
         userService.add(userDto1);
         itemService.add(itemDto1, 1);
-        List<ItemDtoWithDate> itemDtoWithDates = itemService.getAll(1, 0, null);
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        Pageable pageable = PageRequest.of(1, 1, sort);
+        List<ItemDtoWithDate> itemDtoWithDates = itemService.getAllPageable(1, pageable);
         Assertions.assertEquals(itemDtoWithDates.get(0).getId(), itemDto1.getId());
         Assertions.assertEquals(itemDtoWithDates.get(0).getName(), itemDto1.getName());
         Assertions.assertEquals(itemDtoWithDates.get(0).getDescription(), itemDto1.getDescription());

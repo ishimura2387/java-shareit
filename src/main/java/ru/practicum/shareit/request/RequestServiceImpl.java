@@ -1,5 +1,6 @@
 package ru.practicum.shareit.request;
 
+import com.fasterxml.jackson.core.JsonToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -96,11 +97,8 @@ public class RequestServiceImpl implements RequestService {
                 "пользователя на наличие в Storage! Пользователь не найден!"));
         List<ItemRequestDtoOutput> itemRequestDtoOutputs = new ArrayList<>();
         List<ItemRequest> request = new ArrayList<>();
-        if (pageable.getPageSize() < 0 || pageable.getPageSize() == 0 || pageable.getPageNumber() <= 0) {
+        if (pageable.getPageSize() < 0 || pageable.getPageSize() == 0 || pageable.getPageNumber() < 0) {
             throw new PaginationException("Ошибка пагинации!");
-        }
-        if (pageable.getPageNumber() == 0) {
-            pageable = PageRequest.of(1, pageable.getPageSize(), pageable.getSort());
         }
         Page<ItemRequest> pages = requestRepository.findAllByRequestorIdNot(userId, pageable);
         request = pages.get().collect(Collectors.toList());

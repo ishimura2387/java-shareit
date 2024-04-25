@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @RestController
+@Validated
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
@@ -47,7 +50,7 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text,
-                                @RequestParam(defaultValue = "0") Integer from,
+                                @RequestParam(defaultValue = "0") @Min(0) Integer from,
                                 @RequestParam(required = false) Integer size) {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         if (size == null) {
@@ -61,7 +64,7 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDtoWithDate> getAll(@RequestHeader("X-Sharer-User-Id") long userId,
-                                        @RequestParam(defaultValue = "0") Integer from,
+                                        @RequestParam(defaultValue = "0") @Min(0) Integer from,
                                         @RequestParam(required = false) Integer size) {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         if (size == null) {

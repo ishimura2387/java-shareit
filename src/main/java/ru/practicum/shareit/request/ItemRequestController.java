@@ -4,13 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 
 @RestController
+@Validated
 @RequestMapping(path = "/requests")
 @RequiredArgsConstructor
 public class ItemRequestController {
@@ -29,7 +32,7 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestDtoOutput> getAllOther(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                  @RequestParam(defaultValue = "0") Integer from,
+                                                  @RequestParam(defaultValue = "0") @Min(0) Integer from,
                                                   @RequestParam(required = false) Integer size) {
         Sort sort = Sort.by(Sort.Direction.DESC, "created");
         if (size == null) {

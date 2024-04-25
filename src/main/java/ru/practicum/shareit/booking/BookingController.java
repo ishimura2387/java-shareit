@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,9 +16,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @RestController
+@Validated
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
 public class BookingController {
@@ -41,7 +44,7 @@ public class BookingController {
     @GetMapping
     public List<BookingDto> getByUser(@RequestHeader("X-Sharer-User-Id") long userId,
                                       @RequestParam(defaultValue = "ALL") String state,
-                                      @RequestParam(defaultValue = "0") Integer from,
+                                      @RequestParam(defaultValue = "0") @Min(0) Integer from,
                                       @RequestParam(required = false) Integer size) {
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
         if (size == null) {
@@ -56,7 +59,7 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingDto> getByOwner(@RequestHeader("X-Sharer-User-Id") long userId,
                                        @RequestParam(defaultValue = "ALL") String state,
-                                       @RequestParam(defaultValue = "0") Integer from,
+                                       @RequestParam(defaultValue = "0") @Min(0) Integer from,
                                        @RequestParam(required = false) Integer size) {
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
         if (size == null) {

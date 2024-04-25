@@ -119,7 +119,7 @@ public class ItemServiceImpl implements ItemService {
         User user = userRepository.findById(id).orElseThrow(() -> new NullObjectException("Ошибка проверки " +
                 "пользователя на наличие в Storage! Пользователь не найден!"));
         log.debug("Обработка запроса GET /items.Запрошены вещи пользователя: {}", id);
-        if (pageable.getPageSize() < 0 || pageable.getPageSize() == 0 || pageable.getPageNumber() <= 0 ) {
+        if (pageable.getPageSize() < 0 || pageable.getPageSize() == 0 || pageable.getPageNumber() < 0) {
             throw new PaginationException("Ошибка пагинации!");
         }
         if (pageable.getPageNumber() == 0) {
@@ -156,7 +156,8 @@ public class ItemServiceImpl implements ItemService {
             return Collections.emptyList();
         }
         List<Item> items = new ArrayList<>();
-        if (pageable.getPageSize() < 0 || pageable.getPageSize() == 0 || pageable.getPageNumber() <= 0) {
+        if (pageable.getPageSize() < 0 || pageable.getPageSize() == 0 || pageable.getPageNumber() < 0 ||
+                (pageable.getPageSize() < 0 && pageable.getPageNumber() > 0)) {
             throw new PaginationException("Ошибка пагинации!");
         }
         if (pageable.getPageNumber() == 0) {
