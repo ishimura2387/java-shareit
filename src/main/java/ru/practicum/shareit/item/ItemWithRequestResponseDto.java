@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ItemDtoRequestAnswer {
+public class ItemWithRequestResponseDto {
     private long id;
     private String name;
     private Boolean available;

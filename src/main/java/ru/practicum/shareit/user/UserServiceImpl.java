@@ -2,7 +2,7 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.NullObjectException;
+import ru.practicum.shareit.exception.NotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,23 +26,23 @@ public class UserServiceImpl implements UserService {
 
     public UserDto update(UserDto userDto) {
         long id = userDto.getId();
-        User userOld = userRepository.findById(id).
-                orElseThrow(() -> new NullObjectException("Ошибка проверки пользователя на наличие в Storage! " +
+        User userOld = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Ошибка проверки пользователя на наличие в Storage! " +
                         "Пользователь не найден!"));
         User user = userMapper.updateUser(userDto, userOld);
         return userMapper.fromUser(userRepository.save(user));
     }
 
     public void delete(long userId) {
-        User user = userRepository.findById(userId).
-                orElseThrow(() -> new NullObjectException("Ошибка проверки пользователя на наличие в Storage! " +
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Ошибка проверки пользователя на наличие в Storage! " +
                         "Пользователь не найден!"));
         userRepository.deleteById(userId);
     }
 
     public UserDto get(long id) {
-        User user = userRepository.findById(id).
-                orElseThrow(() -> new NullObjectException("Ошибка проверки пользователя на наличие в Storage! " +
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Ошибка проверки пользователя на наличие в Storage! " +
                         "Пользователь не найден!"));
         return userMapper.fromUser(userRepository.getById(id));
     }

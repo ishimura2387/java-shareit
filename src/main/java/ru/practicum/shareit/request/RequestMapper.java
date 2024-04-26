@@ -2,7 +2,7 @@ package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.item.ItemDtoRequestAnswer;
+import ru.practicum.shareit.item.ItemWithRequestResponseDto;
 import ru.practicum.shareit.user.User;
 
 import java.util.Collections;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Component
 public class RequestMapper {
-    public ItemRequest toItemRequest(ItemRequestDto itemRequestDto, User requestor) {
+    public ItemRequest toItemRequest(ru.practicum.shareit.request.ItemRequestDto itemRequestDto, User requestor) {
         ItemRequest itemRequest = new ItemRequest();
         itemRequest.setDescription(itemRequestDto.getDescription());
         itemRequest.setRequestor(requestor);
@@ -21,8 +21,8 @@ public class RequestMapper {
         return itemRequest;
     }
 
-    public ItemRequestDto toItemRequestDto(ItemRequest itemRequest) {
-        ItemRequestDto itemRequestDto = new ItemRequestDto();
+    public ru.practicum.shareit.request.ItemRequestDto toItemRequestDto(ItemRequest itemRequest) {
+        ru.practicum.shareit.request.ItemRequestDto itemRequestDto = new ru.practicum.shareit.request.ItemRequestDto();
         itemRequestDto.setId(itemRequest.getId());
         itemRequestDto.setDescription(itemRequest.getDescription());
         itemRequestDto.setRequestor(itemRequest.getRequestor());
@@ -30,21 +30,21 @@ public class RequestMapper {
         return itemRequestDto;
     }
 
-    public ItemRequestDtoOutput toItemRequestDtoOutput(ItemRequest itemRequest, List<ItemDtoRequestAnswer> items) {
-        ItemRequestDtoOutput itemRequestDtoOutput = new ItemRequestDtoOutput();
-        itemRequestDtoOutput.setId(itemRequest.getId());
-        itemRequestDtoOutput.setDescription(itemRequest.getDescription());
-        itemRequestDtoOutput.setCreated(itemRequest.getCreated());
-        itemRequestDtoOutput.setItems(items);
-        return itemRequestDtoOutput;
+    public ItemRequestWithItemsResponseDto toItemRequestDtoOutput(ItemRequest itemRequest, List<ItemWithRequestResponseDto> items) {
+        ItemRequestWithItemsResponseDto itemRequestWithItemsResponseDto = new ItemRequestWithItemsResponseDto();
+        itemRequestWithItemsResponseDto.setId(itemRequest.getId());
+        itemRequestWithItemsResponseDto.setDescription(itemRequest.getDescription());
+        itemRequestWithItemsResponseDto.setCreated(itemRequest.getCreated());
+        itemRequestWithItemsResponseDto.setItems(items);
+        return itemRequestWithItemsResponseDto;
     }
 
-    public ItemRequestDtoOutput toItemRequestDtoOutputNullRequest(ItemRequest itemRequest) {
-        ItemRequestDtoOutput itemRequestDtoOutput = new ItemRequestDtoOutput();
-        itemRequestDtoOutput.setId(itemRequest.getId());
-        itemRequestDtoOutput.setDescription(itemRequest.getDescription());
-        itemRequestDtoOutput.setCreated(itemRequest.getCreated());
-        itemRequestDtoOutput.setItems(Collections.EMPTY_LIST);
-        return itemRequestDtoOutput;
+    public ItemRequestWithItemsResponseDto toItemRequestDtoOutputNullRequest(ItemRequest itemRequest) {
+        ItemRequestWithItemsResponseDto itemRequestWithItemsResponseDto = new ItemRequestWithItemsResponseDto();
+        itemRequestWithItemsResponseDto.setId(itemRequest.getId());
+        itemRequestWithItemsResponseDto.setDescription(itemRequest.getDescription());
+        itemRequestWithItemsResponseDto.setCreated(itemRequest.getCreated());
+        itemRequestWithItemsResponseDto.setItems(Collections.EMPTY_LIST);
+        return itemRequestWithItemsResponseDto;
     }
 }

@@ -22,9 +22,9 @@ public interface ItemMapper {
     Item updateItem(ItemDto itemDto, @MappingTarget Item item);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    ItemDtoWithDate toItemDtoWithDate(Item item);
+    ItemWithDateResponseDto toItemDtoWithDate(Item item);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "requestId", source = "request.id")
-    ItemDtoRequestAnswer toItemDtoRequestAnswer(Item item);
+    ItemWithRequestResponseDto toItemDtoRequestAnswer(Item item);
 }

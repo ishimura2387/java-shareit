@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.practicum.shareit.exception.NullObjectException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserService;
 
@@ -45,7 +45,7 @@ public class UserServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getWrongUsertTest() {
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     userService.get(1);
                 },
@@ -56,7 +56,7 @@ public class UserServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void updateWrongUsertTest() {
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     userService.update(new UserDto(1, "nameUpdate", "emailUpdate@mail.ru"));
                 },

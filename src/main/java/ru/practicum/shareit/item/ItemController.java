@@ -28,9 +28,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemController {
     private final ItemService itemService;
+    private static final String userID = "X-Sharer-User-Id";
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId,
+    public CommentDto addComment(@RequestHeader(userID) long userId, @PathVariable long itemId,
                                  @Valid @RequestBody CommentDto commentDto) {
         log.debug("Обработка запроса POST/items/" + itemId + "/comment");
         CommentDto comment = itemService.addComment(commentDto, userId, itemId);
@@ -39,7 +40,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto add(@RequestHeader("X-Sharer-User-Id") long userId, @Valid @RequestBody ItemDto itemDto) {
+    public ItemDto add(@RequestHeader(userID) long userId, @Valid @RequestBody ItemDto itemDto) {
         log.debug("Обработка запроса POST/items");
         ItemDto item = itemService.add(itemDto, userId);
         log.debug("Создана вещь: {}", item);
@@ -47,7 +48,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto update(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId,
+    public ItemDto update(@PathVariable long itemId, @RequestHeader(userID) long userId,
                           @RequestBody ItemDto itemDto) {
         itemDto.setId(itemId);
         log.debug("Обработка запроса PATCH/items/" + itemId);
@@ -57,9 +58,9 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDtoWithDate get(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
+    public ItemWithDateResponseDto get(@PathVariable long itemId, @RequestHeader(userID) long userId) {
         log.debug("Обработка запроса GET/items/" + itemId);
-        ItemDtoWithDate item = itemService.get(itemId, userId);
+        ItemWithDateResponseDto item = itemService.get(itemId, userId);
         log.debug("Получена вещь: {}", item);
         return item;
     }
@@ -83,11 +84,11 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDtoWithDate> getAll(@RequestHeader("X-Sharer-User-Id") long userId,
-                                        @RequestParam(defaultValue = "0") @Min(0) Integer from,
-                                        @RequestParam(required = false) @Min(1) Integer size) {
+    public List<ItemWithDateResponseDto> getAll(@RequestHeader(userID) long userId,
+                                                @RequestParam(defaultValue = "0") @Min(0) Integer from,
+                                                @RequestParam(required = false) @Min(1) Integer size) {
         log.debug("Обработка запроса GET/items");
-        List<ItemDtoWithDate> items = new ArrayList<>();
+        List<ItemWithDateResponseDto> items = new ArrayList<>();
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         if (size == null) {
             items = itemService.getAllSort(userId, sort);

@@ -9,15 +9,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.practicum.shareit.exception.NullObjectException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.request.ItemRequestDto;
-import ru.practicum.shareit.request.ItemRequestDtoOutput;
+import ru.practicum.shareit.request.ItemRequestWithItemsResponseDto;
 import ru.practicum.shareit.request.RequestService;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserService;
-import ru.practicum.shareit.user.User;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -47,7 +47,7 @@ public class RequestServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void wrongAddRequestTest() {
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     requestService.add(1, itemRequestDto);
                 },
@@ -60,15 +60,15 @@ public class RequestServiceTest {
     void addAndGetTest() {
         userService.add(userDto1);
         requestService.add(1, itemRequestDto);
-        ItemRequestDtoOutput itemRequestDtoOutput = requestService.get(1, 1);
-        Assertions.assertEquals(itemRequestDtoOutput.getId(), itemRequestDto.getId());
-        Assertions.assertEquals(itemRequestDtoOutput.getDescription(), itemRequestDto.getDescription());
+        ItemRequestWithItemsResponseDto itemRequestWithItemsResponseDto = requestService.get(1, 1);
+        Assertions.assertEquals(itemRequestWithItemsResponseDto.getId(), itemRequestDto.getId());
+        Assertions.assertEquals(itemRequestWithItemsResponseDto.getDescription(), itemRequestDto.getDescription());
     }
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getRequestWrongUserTest() {
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     requestService.get(1, 1);
                 },
@@ -80,7 +80,7 @@ public class RequestServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getRequestWrongRequestTest() {
         userService.add(userDto1);
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     requestService.get(1, 1);
                 },
@@ -91,7 +91,7 @@ public class RequestServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getMyRequestWrongUserTest() {
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     requestService.getAll(1);
                 },
@@ -109,7 +109,7 @@ public class RequestServiceTest {
         requestService.add(1, itemRequestDto);
         requestService.add(2, itemRequestDto2);
         requestService.add(1, itemRequestDto3);
-        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAll(1);
+        List<ItemRequestWithItemsResponseDto> requestDtoOutputs = requestService.getAll(1);
         Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto.getId());
         Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto.getDescription());
         Assertions.assertEquals(requestDtoOutputs.get(1).getId(), itemRequestDto3.getId());
@@ -119,7 +119,7 @@ public class RequestServiceTest {
         itemService.add(itemDto1, 1);
         itemService.add(itemDto2,2);
         itemService.add(itemDto3,2);
-        List<ItemRequestDtoOutput> requestDtoOutputs2 = requestService.getAll(1);
+        List<ItemRequestWithItemsResponseDto> requestDtoOutputs2 = requestService.getAll(1);
         Assertions.assertEquals(requestDtoOutputs2.get(0).getId(), itemRequestDto.getId());
         Assertions.assertEquals(requestDtoOutputs2.get(0).getDescription(), itemRequestDto.getDescription());
         Assertions.assertEquals(requestDtoOutputs2.get(1).getId(), itemRequestDto3.getId());
@@ -129,7 +129,7 @@ public class RequestServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getAllRequestWrongUserTest() {
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     requestService.getAllOtherPageable(1, pageable);
                 },
@@ -147,7 +147,7 @@ public class RequestServiceTest {
         requestService.add(1, itemRequestDto);
         requestService.add(2, itemRequestDto2);
         requestService.add(2, itemRequestDto3);
-        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllOtherPageable(1, pageable);
+        List<ItemRequestWithItemsResponseDto> requestDtoOutputs = requestService.getAllOtherPageable(1, pageable);
         Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto3.getId());
         Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto3.getDescription());
     }
@@ -162,7 +162,7 @@ public class RequestServiceTest {
         requestService.add(1, itemRequestDto);
         requestService.add(2, itemRequestDto2);
         requestService.add(1, itemRequestDto3);
-        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllOtherSort(1, sort);
+        List<ItemRequestWithItemsResponseDto> requestDtoOutputs = requestService.getAllOtherSort(1, sort);
         Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto2.getId());
         Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto2.getDescription());
     }
@@ -182,7 +182,7 @@ public class RequestServiceTest {
         itemService.add(itemDto1, 1);
         itemService.add(itemDto2,2);
         itemService.add(itemDto3,2);
-        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllOtherSort(2, sort);
+        List<ItemRequestWithItemsResponseDto> requestDtoOutputs = requestService.getAllOtherSort(2, sort);
         Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto.getId());
         Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto.getDescription());
     }
@@ -202,7 +202,7 @@ public class RequestServiceTest {
         itemService.add(itemDto1, 1);
         itemService.add(itemDto2,2);
         itemService.add(itemDto3,2);
-        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllOtherPageable(2, pageable);
+        List<ItemRequestWithItemsResponseDto> requestDtoOutputs = requestService.getAllOtherPageable(2, pageable);
         Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto3.getId());
         Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto3.getDescription());
     }

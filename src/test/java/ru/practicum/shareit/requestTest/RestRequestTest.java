@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.request.ItemRequestController;
 import ru.practicum.shareit.request.ItemRequestDto;
-import ru.practicum.shareit.request.ItemRequestDtoOutput;
+import ru.practicum.shareit.request.ItemRequestWithItemsResponseDto;
 import ru.practicum.shareit.request.RequestService;
 import ru.practicum.shareit.user.User;
 
@@ -48,9 +48,9 @@ public class RestRequestTest {
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy,M,d,H,m");
     User user = new User(1, "name1", "email1@mail.ru");
     ItemRequestDto itemRequestDto = new ItemRequestDto(1, "description 1 request", user, start);
-    ItemRequestDtoOutput itemRequestDtoOutput = new ItemRequestDtoOutput(1, "description 1 requestOutput", start, null);
+    ItemRequestWithItemsResponseDto itemRequestWithItemsResponseDto = new ItemRequestWithItemsResponseDto(1, "description 1 requestOutput", start, null);
 
-    List<ItemRequestDtoOutput> itemRequestDtoOutputList = new ArrayList<>();
+    List<ItemRequestWithItemsResponseDto> itemRequestWithItemsResponseDtoList = new ArrayList<>();
 
     @BeforeEach
     void beforeEachTest() {
@@ -84,76 +84,76 @@ public class RestRequestTest {
 
     @Test
     void getMyRequestsTest() throws Exception {
-        itemRequestDtoOutputList.add(itemRequestDtoOutput);
+        itemRequestWithItemsResponseDtoList.add(itemRequestWithItemsResponseDto);
         when(requestService.getAll(any(Long.class)))
-                .thenReturn(List.of(itemRequestDtoOutput));
+                .thenReturn(List.of(itemRequestWithItemsResponseDto));
         mvc.perform(get("/requests")
-                        .content(mapper.writeValueAsString(itemRequestDtoOutputList))
+                        .content(mapper.writeValueAsString(itemRequestWithItemsResponseDtoList))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .header("X-Sharer-User-Id", 1))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.[0].id", is(itemRequestDtoOutput.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].description", is(itemRequestDtoOutput.getDescription())))
-                .andExpect(jsonPath("$.[0].created").value(Arrays.stream(itemRequestDtoOutput.getCreated().format(dtf)
+                .andExpect(jsonPath("$.[0].id", is(itemRequestWithItemsResponseDto.getId()), Long.class))
+                .andExpect(jsonPath("$.[0].description", is(itemRequestWithItemsResponseDto.getDescription())))
+                .andExpect(jsonPath("$.[0].created").value(Arrays.stream(itemRequestWithItemsResponseDto.getCreated().format(dtf)
                                 .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
     }
 
     @Test
     void getItemRequestsSortTest() throws Exception {
-        itemRequestDtoOutputList.add(itemRequestDtoOutput);
+        itemRequestWithItemsResponseDtoList.add(itemRequestWithItemsResponseDto);
         when(requestService.getAllOtherSort(any(Long.class), any(Sort.class)))
-                .thenReturn(List.of(itemRequestDtoOutput));
+                .thenReturn(List.of(itemRequestWithItemsResponseDto));
         mvc.perform(get("/requests/all")
-                        .content(mapper.writeValueAsString(itemRequestDtoOutputList))
+                        .content(mapper.writeValueAsString(itemRequestWithItemsResponseDtoList))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .header("X-Sharer-User-Id", 1))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.[0].id", is(itemRequestDtoOutput.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].description", is(itemRequestDtoOutput.getDescription())))
-                .andExpect(jsonPath("$.[0].created").value(Arrays.stream(itemRequestDtoOutput.getCreated().format(dtf)
+                .andExpect(jsonPath("$.[0].id", is(itemRequestWithItemsResponseDto.getId()), Long.class))
+                .andExpect(jsonPath("$.[0].description", is(itemRequestWithItemsResponseDto.getDescription())))
+                .andExpect(jsonPath("$.[0].created").value(Arrays.stream(itemRequestWithItemsResponseDto.getCreated().format(dtf)
                                 .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
     }
 
     @Test
     void getItemRequestsPageableTest() throws Exception {
-        itemRequestDtoOutputList.add(itemRequestDtoOutput);
+        itemRequestWithItemsResponseDtoList.add(itemRequestWithItemsResponseDto);
         when(requestService.getAllOtherPageable(any(Long.class), any(Pageable.class)))
-                .thenReturn(List.of(itemRequestDtoOutput));
+                .thenReturn(List.of(itemRequestWithItemsResponseDto));
         mvc.perform(get("/requests/all?from=1&size=2")
-                        .content(mapper.writeValueAsString(itemRequestDtoOutputList))
+                        .content(mapper.writeValueAsString(itemRequestWithItemsResponseDtoList))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .header("X-Sharer-User-Id", 1))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.[0].id", is(itemRequestDtoOutput.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].description", is(itemRequestDtoOutput.getDescription())))
-                .andExpect(jsonPath("$.[0].created").value(Arrays.stream(itemRequestDtoOutput.getCreated().format(dtf)
+                .andExpect(jsonPath("$.[0].id", is(itemRequestWithItemsResponseDto.getId()), Long.class))
+                .andExpect(jsonPath("$.[0].description", is(itemRequestWithItemsResponseDto.getDescription())))
+                .andExpect(jsonPath("$.[0].created").value(Arrays.stream(itemRequestWithItemsResponseDto.getCreated().format(dtf)
                         .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
     }
 
     @Test
     void getItemRequestTest() throws Exception {
         when(requestService.get(any(Long.class), any(Long.class)))
-                .thenReturn(itemRequestDtoOutput);
+                .thenReturn(itemRequestWithItemsResponseDto);
         mvc.perform(get("/requests/1")
-                        .content(mapper.writeValueAsString(itemRequestDtoOutput))
+                        .content(mapper.writeValueAsString(itemRequestWithItemsResponseDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .header("X-Sharer-User-Id", 1))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(itemRequestDtoOutput.getId()), Long.class))
-                .andExpect(jsonPath("$.description", is(itemRequestDtoOutput.getDescription())))
-                .andExpect(jsonPath("$.created").value(Arrays.stream(itemRequestDtoOutput.getCreated().format(dtf)
+                .andExpect(jsonPath("$.id", is(itemRequestWithItemsResponseDto.getId()), Long.class))
+                .andExpect(jsonPath("$.description", is(itemRequestWithItemsResponseDto.getDescription())))
+                .andExpect(jsonPath("$.created").value(Arrays.stream(itemRequestWithItemsResponseDto.getCreated().format(dtf)
                                 .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
     }
 }

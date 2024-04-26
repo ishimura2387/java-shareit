@@ -13,22 +13,16 @@ import ru.practicum.shareit.booking.BookingDto;
 import ru.practicum.shareit.booking.BookingInputDto;
 import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.Status;
-import ru.practicum.shareit.exception.AvailableException;
-import ru.practicum.shareit.exception.NoOneApprovedException;
-import ru.practicum.shareit.exception.NullObjectException;
-import ru.practicum.shareit.exception.OwnerException;
-import ru.practicum.shareit.exception.SetStatusBookingException;
-import ru.practicum.shareit.exception.StateException;
-import ru.practicum.shareit.exception.TimeBookingValidationException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserService;
-import java.util.concurrent.TimeUnit;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @SpringBootTest
@@ -53,7 +47,7 @@ public class BookingServiceTest {
     void wrongItemAddBookingTest() {
         LocalDateTime start = LocalDateTime.now();
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(2));
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     bookingService.add(bookingInputDto, 1);
                 },
@@ -68,7 +62,7 @@ public class BookingServiceTest {
         userService.add(userDto1);
         itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(2));
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     bookingService.add(bookingInputDto, 2);
                 },
@@ -85,7 +79,7 @@ public class BookingServiceTest {
         itemService.add(itemDto1, 1);
         itemService.add(itemDto2, 2);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 2, start.plusHours(1), start.plusHours(2));
-        AvailableException exception = Assertions.assertThrows(AvailableException.class,
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> {
                     bookingService.add(bookingInputDto, 1);
                 },
@@ -100,7 +94,7 @@ public class BookingServiceTest {
         userService.add(userDto1);
         itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(2));
-        OwnerException exception = Assertions.assertThrows(OwnerException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     bookingService.add(bookingInputDto, 1);
                 },
@@ -118,19 +112,19 @@ public class BookingServiceTest {
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(2), start.plusHours(1));
         BookingInputDto bookingInputDto2 = new BookingInputDto(2, 1, start.minusHours(1), start.plusHours(2));
         BookingInputDto bookingInputDto3 = new BookingInputDto(3, 1, start.plusHours(1), start.plusHours(1));
-        TimeBookingValidationException exception = Assertions.assertThrows(TimeBookingValidationException.class,
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> {
                     bookingService.add(bookingInputDto, 2);
                 },
                 "Время бронирования не корректно!");
         Assertions.assertEquals("Время бронирования не корректно!", exception.getMessage());
-        TimeBookingValidationException exception2 = Assertions.assertThrows(TimeBookingValidationException.class,
+        IllegalArgumentException exception2 = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> {
                     bookingService.add(bookingInputDto2, 2);
                 },
                 "Время бронирования не корректно!");
         Assertions.assertEquals("Время бронирования не корректно!", exception2.getMessage());
-        TimeBookingValidationException exception3 = Assertions.assertThrows(TimeBookingValidationException.class,
+        IllegalArgumentException exception3 = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> {
                     bookingService.add(bookingInputDto3, 2);
                 },
@@ -139,7 +133,7 @@ public class BookingServiceTest {
         BookingInputDto bookingInputDto4 = new BookingInputDto(4, 1, start.plusHours(1), start.plusHours(3));
         BookingInputDto bookingInputDto5 = new BookingInputDto(5, 1, start.plusHours(2), start.plusHours(4));
         bookingService.add(bookingInputDto4, 2);
-        TimeBookingValidationException exception4 = Assertions.assertThrows(TimeBookingValidationException.class,
+        IllegalArgumentException exception4 = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> {
                     bookingService.add(bookingInputDto5, 2);
                 },
@@ -171,7 +165,7 @@ public class BookingServiceTest {
     void getErrorBookingTest() {
         userService.add(userDto1);
         userService.add(userDto2);
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     bookingService.get(2, 2);
                 },
@@ -184,7 +178,7 @@ public class BookingServiceTest {
     void setStatusErrorBookingTest() {
         userService.add(userDto1);
         userService.add(userDto2);
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     bookingService.setStatus(2, true, 2);
                 },
@@ -202,7 +196,7 @@ public class BookingServiceTest {
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(3));
         bookingService.add(bookingInputDto, 2);
         bookingService.setStatus(1, true, 1);
-        NoOneApprovedException exception = Assertions.assertThrows(NoOneApprovedException.class,
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> {
                     bookingService.setStatus(1, true, 1);
                 },
@@ -219,7 +213,7 @@ public class BookingServiceTest {
         itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(3));
         bookingService.add(bookingInputDto, 2);
-        SetStatusBookingException exception = Assertions.assertThrows(SetStatusBookingException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     bookingService.setStatus(1, true, 2);
                 },
@@ -250,7 +244,7 @@ public class BookingServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserWrongBookingTest() {
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     bookingService.getAllByUserSort(1, "CURRENT", sort);
                 },
@@ -262,7 +256,7 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByUserWrongStateTest() {
         userService.add(userDto1);
-        StateException exception = Assertions.assertThrows(StateException.class,
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> {
                     bookingService.getAllByUserSort(1, "abrakadabra", sort);
                 },
@@ -397,7 +391,7 @@ public class BookingServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerWrongBookingTest() {
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     bookingService.getAllByOwnerSort(1, "CURRENT", sort);
                 },
@@ -409,7 +403,7 @@ public class BookingServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getBookingByOwnerWrongStateTest() {
         userService.add(userDto1);
-        StateException exception = Assertions.assertThrows(StateException.class,
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> {
                     bookingService.getAllByOwnerSort(1, "abrakadabra", sort);
                 },

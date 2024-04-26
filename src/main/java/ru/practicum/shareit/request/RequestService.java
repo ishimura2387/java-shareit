@@ -8,11 +8,11 @@ import java.util.List;
 public interface RequestService {
     ItemRequestDto add(long userId, ItemRequestDto itemRequestDto);
 
-    List<ItemRequestDtoOutput> getAll(long userId);
+    List<ItemRequestWithItemsResponseDto> getAll(long userId);
 
-    List<ItemRequestDtoOutput> getAllOtherSort(long userId, Sort sort);
+    List<ItemRequestWithItemsResponseDto> getAllOtherSort(long userId, Sort sort);
 
-    List<ItemRequestDtoOutput> getAllOtherPageable(long userId, Pageable pageable);
+    List<ItemRequestWithItemsResponseDto> getAllOtherPageable(long userId, Pageable pageable);
 
-    ItemRequestDtoOutput get(long userId, long requestId);
+    ItemRequestWithItemsResponseDto get(long userId, long requestId);
 }

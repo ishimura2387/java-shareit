@@ -10,12 +10,12 @@ public interface ItemService {
 
     ItemDto update(ItemDto itemDto, long userId, long itemId);
 
-    ItemDtoWithDate get(long itemId, long userId);
+    ItemWithDateResponseDto get(long itemId, long userId);
 
 
-    List<ItemDtoWithDate> getAllSort(long id, Sort sort);
+    List<ItemWithDateResponseDto> getAllSort(long id, Sort sort);
 
-    List<ItemDtoWithDate> getAllPageable(long id, Pageable pageable);
+    List<ItemWithDateResponseDto> getAllPageable(long id, Pageable pageable);
 
     List<ItemDto> searchSort(String text, Sort sort);
 

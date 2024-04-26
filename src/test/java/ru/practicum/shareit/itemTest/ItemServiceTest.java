@@ -11,12 +11,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.BookingInputDto;
 import ru.practicum.shareit.booking.BookingService;
-import ru.practicum.shareit.exception.CommentException;
-import ru.practicum.shareit.exception.NullObjectException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.CommentDto;
 import ru.practicum.shareit.item.ItemDto;
-import ru.practicum.shareit.item.ItemDtoWithDate;
 import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.item.ItemWithDateResponseDto;
 import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserService;
 
@@ -52,7 +51,7 @@ public class ItemServiceTest {
         itemService.add(itemDto1, 1);
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusHours(1), start.plusHours(2));
         bookingService.add(bookingInputDto, 2);
-        CommentException exception = Assertions.assertThrows(CommentException.class,
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> {
                     itemService.addComment(commentDto, 2, 1);
                 },
@@ -70,7 +69,7 @@ public class ItemServiceTest {
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
         bookingService.add(bookingInputDto, 2);
         TimeUnit.SECONDS.sleep(3);
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     itemService.addComment(commentDto, 3, 1);
                 },
@@ -88,7 +87,7 @@ public class ItemServiceTest {
         BookingInputDto bookingInputDto = new BookingInputDto(1, 1, start.plusSeconds(1), start.plusSeconds(2));
         bookingService.add(bookingInputDto, 2);
         TimeUnit.SECONDS.sleep(3);
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     itemService.addComment(commentDto, 1, 2);
                 },
@@ -116,7 +115,7 @@ public class ItemServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void createItemWrongUserTest() {
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     itemService.add(itemDto1, 1);
                 },
@@ -128,7 +127,7 @@ public class ItemServiceTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void createItemWrongRequestTest() {
         userService.add(userDto1);
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     itemService.add(itemDto2, 1);
                 },
@@ -141,7 +140,7 @@ public class ItemServiceTest {
     void createAndGetItemTest() {
         userService.add(userDto1);
         itemService.add(itemDto1, 1);
-        ItemDtoWithDate itemDto = itemService.get(1, 1);
+        ItemWithDateResponseDto itemDto = itemService.get(1, 1);
         Assertions.assertEquals(itemDto.getId(), itemDto1.getId());
         Assertions.assertEquals(itemDto.getName(), itemDto1.getName());
         Assertions.assertEquals(itemDto.getDescription(), itemDto1.getDescription());
@@ -163,7 +162,7 @@ public class ItemServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getItemWrongItemTest() {
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     itemService.get(1, 1);
                 },
@@ -174,7 +173,7 @@ public class ItemServiceTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getMyItemsWrongUserTest() {
-        NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
                     itemService.getAllSort(1, sort);
                 },
@@ -187,10 +186,10 @@ public class ItemServiceTest {
     void getMyItemsNullSizeTest() {
         userService.add(userDto1);
         itemService.add(itemDto1, 1);
-        List<ItemDtoWithDate> itemDtoWithDates = itemService.getAllSort(1, sort);
-        Assertions.assertEquals(itemDtoWithDates.get(0).getId(), itemDto1.getId());
-        Assertions.assertEquals(itemDtoWithDates.get(0).getName(), itemDto1.getName());
-        Assertions.assertEquals(itemDtoWithDates.get(0).getDescription(), itemDto1.getDescription());
+        List<ItemWithDateResponseDto> itemWithDateResponseDtos = itemService.getAllSort(1, sort);
+        Assertions.assertEquals(itemWithDateResponseDtos.get(0).getId(), itemDto1.getId());
+        Assertions.assertEquals(itemWithDateResponseDtos.get(0).getName(), itemDto1.getName());
+        Assertions.assertEquals(itemWithDateResponseDtos.get(0).getDescription(), itemDto1.getDescription());
     }
 
     @Test
@@ -198,10 +197,10 @@ public class ItemServiceTest {
     void getMyItemsWithPaginationTest() {
         userService.add(userDto1);
         itemService.add(itemDto1, 1);
-        List<ItemDtoWithDate> itemDtoWithDates = itemService.getAllPageable(1, pageable);
-        Assertions.assertEquals(itemDtoWithDates.get(0).getId(), itemDto1.getId());
-        Assertions.assertEquals(itemDtoWithDates.get(0).getName(), itemDto1.getName());
-        Assertions.assertEquals(itemDtoWithDates.get(0).getDescription(), itemDto1.getDescription());
+        List<ItemWithDateResponseDto> itemWithDateResponseDtos = itemService.getAllPageable(1, pageable);
+        Assertions.assertEquals(itemWithDateResponseDtos.get(0).getId(), itemDto1.getId());
+        Assertions.assertEquals(itemWithDateResponseDtos.get(0).getName(), itemDto1.getName());
+        Assertions.assertEquals(itemWithDateResponseDtos.get(0).getDescription(), itemDto1.getDescription());
     }
 
 

@@ -25,6 +25,6 @@ public interface BookingMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "bookerId", source = "booker.id")
-    BookingDtoShort toBookingDtoShort(Booking booking);
+    BookingShortResponseDto toBookingDtoShort(Booking booking);
 }
 

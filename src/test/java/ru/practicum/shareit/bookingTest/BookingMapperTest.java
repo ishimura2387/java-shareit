@@ -8,13 +8,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingDto;
-import ru.practicum.shareit.booking.BookingDtoShort;
 import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.BookingShortResponseDto;
 import ru.practicum.shareit.booking.Status;
-import ru.practicum.shareit.item.ItemDto;
-import ru.practicum.shareit.user.UserDto;
-import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.item.ItemDto;
+import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserDto;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -100,14 +100,14 @@ public class BookingMapperTest {
     void toBookingDtoShortTest() {
         LocalDateTime start = LocalDateTime.now();
         Booking booking = new Booking(1, start.plusSeconds(1), start.plusSeconds(2),  item, user, Status.WAITING);
-        BookingDtoShort bookingNull = bookingMapper.toBookingDtoShort(null);
+        BookingShortResponseDto bookingNull = bookingMapper.toBookingDtoShort(null);
         Assertions.assertNull(bookingNull);
-        BookingDtoShort bookingDtoShort = bookingMapper.toBookingDtoShort(booking);
-        Assertions.assertEquals(bookingDtoShort.getClass(), BookingDtoShort.class);
-        Assertions.assertEquals(bookingDtoShort.getId(), booking.getId());
-        Assertions.assertEquals(bookingDtoShort.getStart(), booking.getStart());
-        Assertions.assertEquals(bookingDtoShort.getEnd(), booking.getEnd());
-        Assertions.assertEquals(bookingDtoShort.getBookerId(), booking.getBooker().getId());
-        Assertions.assertEquals(bookingDtoShort.getStatus(), booking.getStatus());
+        BookingShortResponseDto bookingShortResponseDto = bookingMapper.toBookingDtoShort(booking);
+        Assertions.assertEquals(bookingShortResponseDto.getClass(), BookingShortResponseDto.class);
+        Assertions.assertEquals(bookingShortResponseDto.getId(), booking.getId());
+        Assertions.assertEquals(bookingShortResponseDto.getStart(), booking.getStart());
+        Assertions.assertEquals(bookingShortResponseDto.getEnd(), booking.getEnd());
+        Assertions.assertEquals(bookingShortResponseDto.getBookerId(), booking.getBooker().getId());
+        Assertions.assertEquals(bookingShortResponseDto.getStatus(), booking.getStatus());
     }
 }
