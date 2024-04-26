@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -27,7 +29,6 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -101,9 +102,9 @@ public class RestRequestTest {
     }
 
     @Test
-    void getItemRequestsTest() throws Exception {
+    void getItemRequestsSortTest() throws Exception {
         itemRequestDtoOutputList.add(itemRequestDtoOutput);
-        when(requestService.getAllOther(any(Long.class), any(Integer.class), nullable(Integer.class)))
+        when(requestService.getAllOtherSort(any(Long.class), any(Sort.class)))
                 .thenReturn(List.of(itemRequestDtoOutput));
         mvc.perform(get("/requests/all")
                         .content(mapper.writeValueAsString(itemRequestDtoOutputList))
@@ -117,6 +118,25 @@ public class RestRequestTest {
                 .andExpect(jsonPath("$.[0].description", is(itemRequestDtoOutput.getDescription())))
                 .andExpect(jsonPath("$.[0].created").value(Arrays.stream(itemRequestDtoOutput.getCreated().format(dtf)
                                 .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
+    }
+
+    @Test
+    void getItemRequestsPageableTest() throws Exception {
+        itemRequestDtoOutputList.add(itemRequestDtoOutput);
+        when(requestService.getAllOtherPageable(any(Long.class), any(Pageable.class)))
+                .thenReturn(List.of(itemRequestDtoOutput));
+        mvc.perform(get("/requests/all?from=1&size=2")
+                        .content(mapper.writeValueAsString(itemRequestDtoOutputList))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.[0].id", is(itemRequestDtoOutput.getId()), Long.class))
+                .andExpect(jsonPath("$.[0].description", is(itemRequestDtoOutput.getDescription())))
+                .andExpect(jsonPath("$.[0].created").value(Arrays.stream(itemRequestDtoOutput.getCreated().format(dtf)
+                        .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
     }
 
     @Test

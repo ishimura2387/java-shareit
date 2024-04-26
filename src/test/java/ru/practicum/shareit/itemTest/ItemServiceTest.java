@@ -13,7 +13,6 @@ import ru.practicum.shareit.booking.BookingInputDto;
 import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.exception.CommentException;
 import ru.practicum.shareit.exception.NullObjectException;
-import ru.practicum.shareit.exception.PaginationException;
 import ru.practicum.shareit.item.CommentDto;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemDtoWithDate;
@@ -41,6 +40,8 @@ public class ItemServiceTest {
     private ItemDto itemDto2 = new ItemDto(2, "item 2", "description item 2",
             false, null, 1);
     private CommentDto commentDto = new CommentDto(1, "text comment 1", "Garry Potter", timeStart);
+    Sort sort = Sort.by(Sort.Direction.DESC, "id");
+    Pageable pageable = PageRequest.of(0, 1, sort);
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -175,7 +176,7 @@ public class ItemServiceTest {
     void getMyItemsWrongUserTest() {
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    itemService.getAllSort(1, Sort.by(Sort.Direction.DESC, "id"));
+                    itemService.getAllSort(1, sort);
                 },
                 "Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!");
         Assertions.assertEquals("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!", exception.getMessage());
@@ -186,7 +187,7 @@ public class ItemServiceTest {
     void getMyItemsNullSizeTest() {
         userService.add(userDto1);
         itemService.add(itemDto1, 1);
-        List<ItemDtoWithDate> itemDtoWithDates = itemService.getAllSort(1, Sort.by(Sort.Direction.DESC, "id"));
+        List<ItemDtoWithDate> itemDtoWithDates = itemService.getAllSort(1, sort);
         Assertions.assertEquals(itemDtoWithDates.get(0).getId(), itemDto1.getId());
         Assertions.assertEquals(itemDtoWithDates.get(0).getName(), itemDto1.getName());
         Assertions.assertEquals(itemDtoWithDates.get(0).getDescription(), itemDto1.getDescription());
@@ -197,45 +198,19 @@ public class ItemServiceTest {
     void getMyItemsWithPaginationTest() {
         userService.add(userDto1);
         itemService.add(itemDto1, 1);
-        Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable = PageRequest.of(1, 1, sort);
         List<ItemDtoWithDate> itemDtoWithDates = itemService.getAllPageable(1, pageable);
         Assertions.assertEquals(itemDtoWithDates.get(0).getId(), itemDto1.getId());
         Assertions.assertEquals(itemDtoWithDates.get(0).getName(), itemDto1.getName());
         Assertions.assertEquals(itemDtoWithDates.get(0).getDescription(), itemDto1.getDescription());
     }
 
-    @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getMyItemsWrongPaginationTest() {
-        userService.add(userDto1);
-        itemService.add(itemDto1, 1);
-        PaginationException exception = Assertions.assertThrows(PaginationException.class,
-                () -> {
-                    itemService.getAll(1, 1, -1);
-                },
-                "Ошибка пагинации!");
-        Assertions.assertEquals("Ошибка пагинации!", exception.getMessage());
-        PaginationException exception2 = Assertions.assertThrows(PaginationException.class,
-                () -> {
-                    itemService.getAll(1, 1, 0);
-                },
-                "Ошибка пагинации!");
-        Assertions.assertEquals("Ошибка пагинации!", exception2.getMessage());
-        PaginationException exception3 = Assertions.assertThrows(PaginationException.class,
-                () -> {
-                    itemService.getAll(1, -1, 2);
-                },
-                "Ошибка пагинации!");
-        Assertions.assertEquals("Ошибка пагинации!", exception3.getMessage());
-    }
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getItemsForRentNotNullSizeTest() {
+    void getItemsForRentPeagableTest() {
         userService.add(userDto1);
         itemService.add(itemDto1, 1);
-        List<ItemDto> itemDto = itemService.search("item", 1, 2);
+        List<ItemDto> itemDto = itemService.searchPageable("item", pageable);
         Assertions.assertEquals(itemDto.get(0).getId(), itemDto1.getId());
         Assertions.assertEquals(itemDto.get(0).getName(), itemDto1.getName());
         Assertions.assertEquals(itemDto.get(0).getDescription(), itemDto1.getDescription());
@@ -243,37 +218,12 @@ public class ItemServiceTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getItemsForRentNullSizeTest() {
+    void getItemsForRentSortTest() {
         userService.add(userDto1);
         itemService.add(itemDto1, 1);
-        List<ItemDto> itemDto = itemService.search("item", 0, null);
+        List<ItemDto> itemDto = itemService.searchSort("item", sort);
         Assertions.assertEquals(itemDto.get(0).getId(), itemDto1.getId());
         Assertions.assertEquals(itemDto.get(0).getName(), itemDto1.getName());
         Assertions.assertEquals(itemDto.get(0).getDescription(), itemDto1.getDescription());
-    }
-
-    @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getItemsForRentWrongPaginationTest() {
-        userService.add(userDto1);
-        itemService.add(itemDto1, 1);
-        PaginationException exception = Assertions.assertThrows(PaginationException.class,
-                () -> {
-                    itemService.search("item", 1, -1);
-                },
-                "Ошибка пагинации!");
-        Assertions.assertEquals("Ошибка пагинации!", exception.getMessage());
-        PaginationException exception2 = Assertions.assertThrows(PaginationException.class,
-                () -> {
-                    itemService.search("item", 1, 0);
-                },
-                "Ошибка пагинации!");
-        Assertions.assertEquals("Ошибка пагинации!", exception2.getMessage());
-        PaginationException exception3 = Assertions.assertThrows(PaginationException.class,
-                () -> {
-                    itemService.search("item", -1, 2);
-                },
-                "Ошибка пагинации!");
-        Assertions.assertEquals("Ошибка пагинации!", exception3.getMessage());
     }
 }

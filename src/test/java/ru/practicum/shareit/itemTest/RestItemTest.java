@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -28,7 +30,6 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -141,9 +142,9 @@ public class RestItemTest {
     }
 
     @Test
-    void getItemsForRentTest() throws Exception {
+    void getItemsForRentSortTest() throws Exception {
         itemDtos.add(itemDto);
-        when(itemService.search(any(String.class), any(Integer.class), nullable(Integer.class)))
+        when(itemService.searchSort(any(String.class), any(Sort.class)))
                 .thenReturn(List.of(itemDto));
         mvc.perform(get("/items/search?text=description")
                         .content(mapper.writeValueAsString(itemDtos))
@@ -160,11 +161,49 @@ public class RestItemTest {
     }
 
     @Test
-    void getMyItemsTest() throws Exception {
+    void getItemsForRentPageableTest() throws Exception {
+        itemDtos.add(itemDto);
+        when(itemService.searchPageable(any(String.class), any(Pageable.class)))
+                .thenReturn(List.of(itemDto));
+        mvc.perform(get("/items/search?text=description?from=1&size=2")
+                        .content(mapper.writeValueAsString(itemDtos))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.[0].id", is(itemDto.getId()), Long.class))
+                .andExpect(jsonPath("$.[0].name", is(itemDto.getName())))
+                .andExpect(jsonPath("$.[0].description", is(itemDto.getDescription())))
+                .andExpect(jsonPath("$.[0].available", is(itemDto.getAvailable())));
+    }
+
+    @Test
+    void getMyItemsSortTest() throws Exception {
         itemDtoWithDates.add(itemDtoWithDate);
-        when(itemService.getAll(any(Long.class), any(Integer.class), nullable(Integer.class)))
+        when(itemService.getAllSort(any(Long.class), any(Sort.class)))
                 .thenReturn(List.of(itemDtoWithDate));
         mvc.perform(get("/items")
+                        .content(mapper.writeValueAsString(itemDtoWithDates))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.[0].id", is(itemDtoWithDate.getId()), Long.class))
+                .andExpect(jsonPath("$.[0].name", is(itemDtoWithDate.getName())))
+                .andExpect(jsonPath("$.[0].description", is(itemDtoWithDate.getDescription())))
+                .andExpect(jsonPath("$.[0].available", is(itemDtoWithDate.getAvailable())));
+    }
+
+    @Test
+    void getMyItemsPageableTest() throws Exception {
+        itemDtoWithDates.add(itemDtoWithDate);
+        when(itemService.getAllPageable(any(Long.class), any(Pageable.class)))
+                .thenReturn(List.of(itemDtoWithDate));
+        mvc.perform(get("/items?from=1&size=2")
                         .content(mapper.writeValueAsString(itemDtoWithDates))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)

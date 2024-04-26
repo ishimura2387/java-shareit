@@ -5,9 +5,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.exception.NullObjectException;
-import ru.practicum.shareit.exception.PaginationException;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.request.ItemRequestDto;
@@ -38,6 +40,9 @@ public class RequestServiceTest {
 
     private User user2 = new User(2, "user not dto 2", "userNotDto2@mail.ru");
     private ItemRequestDto itemRequestDto = new ItemRequestDto(1, "description 1 request", user, LocalDateTime.now());
+
+    Sort sort = Sort.by(Sort.Direction.DESC, "created");
+    Pageable pageable = PageRequest.of(0, 1, sort);
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -126,35 +131,10 @@ public class RequestServiceTest {
     void getAllRequestWrongUserTest() {
         NullObjectException exception = Assertions.assertThrows(NullObjectException.class,
                 () -> {
-                    requestService.getAllOther(1, 1, 2);
+                    requestService.getAllOtherPageable(1, pageable);
                 },
                 "Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!");
         Assertions.assertEquals("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!", exception.getMessage());
-    }
-
-    @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getAllRequestWrongPaginationTest() {
-        userService.add(userDto1);
-        requestService.add(1, itemRequestDto);
-        PaginationException exception = Assertions.assertThrows(PaginationException.class,
-                () -> {
-                    requestService.getAllOther(1, 1, -1);
-                },
-                "Ошибка пагинации!");
-        Assertions.assertEquals("Ошибка пагинации!", exception.getMessage());
-        PaginationException exception2 = Assertions.assertThrows(PaginationException.class,
-                () -> {
-                    requestService.getAllOther(1, 1, 0);
-                },
-                "Ошибка пагинации!");
-        Assertions.assertEquals("Ошибка пагинации!", exception2.getMessage());
-        PaginationException exception3 = Assertions.assertThrows(PaginationException.class,
-                () -> {
-                    requestService.getAllOther(1, -1, 2);
-                },
-                "Ошибка пагинации!");
-        Assertions.assertEquals("Ошибка пагинации!", exception3.getMessage());
     }
 
     @Test
@@ -167,14 +147,14 @@ public class RequestServiceTest {
         requestService.add(1, itemRequestDto);
         requestService.add(2, itemRequestDto2);
         requestService.add(2, itemRequestDto3);
-        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllOther(1, 1, 2);
+        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllOtherPageable(1, pageable);
         Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto3.getId());
         Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto3.getDescription());
     }
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getAllRequestWithoutPaginationTest() {
+    void getAllRequestSortTest() {
         userService.add(userDto1);
         userService.add(userDto2);
         ItemRequestDto itemRequestDto2 = new ItemRequestDto(2, "description 2 request", user2, LocalDateTime.now());
@@ -182,14 +162,14 @@ public class RequestServiceTest {
         requestService.add(1, itemRequestDto);
         requestService.add(2, itemRequestDto2);
         requestService.add(1, itemRequestDto3);
-        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllOther(1, 0, null);
+        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllOtherSort(1, sort);
         Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto2.getId());
         Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto2.getDescription());
     }
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getAllRequestNullSizeTest() {
+    void getAllRequestOtherSortTest() {
         userService.add(userDto1);
         userService.add(userDto2);
         ItemRequestDto itemRequestDto2 = new ItemRequestDto(2, "description 2 request", user2, LocalDateTime.now());
@@ -202,7 +182,7 @@ public class RequestServiceTest {
         itemService.add(itemDto1, 1);
         itemService.add(itemDto2,2);
         itemService.add(itemDto3,2);
-        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllOther(2, 0, null);
+        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllOtherSort(2, sort);
         Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto.getId());
         Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto.getDescription());
     }
@@ -222,7 +202,7 @@ public class RequestServiceTest {
         itemService.add(itemDto1, 1);
         itemService.add(itemDto2,2);
         itemService.add(itemDto3,2);
-        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllOther(2, 1, 1);
+        List<ItemRequestDtoOutput> requestDtoOutputs = requestService.getAllOtherPageable(2, pageable);
         Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto3.getId());
         Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto3.getDescription());
     }

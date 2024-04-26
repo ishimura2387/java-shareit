@@ -16,7 +16,6 @@ import ru.practicum.shareit.booking.BookingController;
 import ru.practicum.shareit.booking.BookingDto;
 import java.time.format.DateTimeFormatter;
 
-import static org.mockito.ArgumentMatchers.nullable;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -166,7 +165,7 @@ public class RestBookingTest {
         when(bookingService.getAllByUserPageable(any(Long.class), any(String.class),
                 any(Pageable.class)))
                 .thenReturn(List.of(bookingDto));
-        mvc.perform(get("/bookings")
+        mvc.perform(get("/bookings?from=1&size=2")
                         .content(mapper.writeValueAsString(bookingDtos))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -214,7 +213,7 @@ public class RestBookingTest {
         when(bookingService.getAllByOwnerPageable(any(Long.class), any(String.class),
                 any(Pageable.class)))
                 .thenReturn(List.of(bookingDto));
-        mvc.perform(get("/bookings/owner")
+        mvc.perform(get("/bookings/owner?from=1&size=2")
                         .content(mapper.writeValueAsString(bookingDtos))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
