@@ -121,7 +121,6 @@ public class ItemServiceImpl implements ItemService {
         List<Booking> allBookings = downloadBooking(itemIds);
         for (Item item : items) {
             ItemWithDateResponseDto itemWithDateResponseDto = itemMapper.toItemDtoWithDate(item);
-            ;
             LocalDateTime localDateTime = LocalDateTime.now();
             Optional<Booking> nextBooking = allBookings.stream().filter(booking ->
                     booking.getItem().getId() == item.getId()).filter(booking ->
