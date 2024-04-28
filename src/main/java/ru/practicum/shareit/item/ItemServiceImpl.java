@@ -127,7 +127,7 @@ public class ItemServiceImpl implements ItemService {
             List<CommentDto> comments = new ArrayList<>();
             List<Booking> bookings = new ArrayList<>();
             for (Comment comment : allComments) {
-                if (comment.getItem().getId() == item.getId()) {
+                if (comment.getItem().getId().longValue() == item.getId().longValue()) {
                     comments.add(commentMapper.fromComment(comment));
                 }
             }
@@ -143,10 +143,10 @@ public class ItemServiceImpl implements ItemService {
             ItemWithDateResponseDto itemWithDateResponseDto = itemMapper.toItemDtoWithDate(item);
             LocalDateTime localDateTime = LocalDateTime.now();
             Optional<Booking> nextBooking = itemBooking.get(item.getId()).stream().filter(booking ->
-                    booking.getItem().getId() == item.getId()).filter(booking ->
+                    booking.getItem().getId().longValue() == item.getId().longValue()).filter(booking ->
                     booking.getStart().isAfter(localDateTime)).reduce((a, b) -> b);
             Optional<Booking> lastBooking = itemBooking.get(item.getId()).stream().filter(booking ->
-                    booking.getItem().getId() == item.getId()).filter(booking ->
+                    booking.getItem().getId().longValue() == item.getId().longValue()).filter(booking ->
                     booking.getStart().isBefore(localDateTime)).reduce((a, b) -> a);
             if (!nextBooking.isEmpty()) {
                 itemWithDateResponseDto.setNextBooking(bookingMapper.toBookingDtoShort(nextBooking.get()));

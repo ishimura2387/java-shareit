@@ -51,7 +51,7 @@ public class RequestServiceImpl implements RequestService {
         if (items.size() > 0) {
             for (ItemRequest itemRequest : requests) {
                 List<ItemWithRequestResponseDto> itemsDto = items.stream().filter(item ->
-                                item.getRequest().getId() == itemRequest.getId())
+                                item.getRequest().getId().longValue() == itemRequest.getId().longValue())
                         .map(item -> itemMapper.toItemDtoRequestAnswer(item)).collect(Collectors.toList());
                 ItemRequestWithItemsResponseDto itemDtoRequestAnswer = requestMapper.toItemRequestDtoOutput(itemRequest, itemsDto);
                 itemRequestWithItemsResponseDtos.add(itemDtoRequestAnswer);
@@ -80,7 +80,7 @@ public class RequestServiceImpl implements RequestService {
         if (items.size() > 0) {
             for (ItemRequest itemRequest : request) {
                 List<ItemWithRequestResponseDto> itemsDto = items.stream().filter(item ->
-                                item.getRequest().getId() == itemRequest.getId()).map(item ->
+                                item.getRequest().getId().longValue() == itemRequest.getId().longValue()).map(item ->
                         itemMapper.toItemDtoRequestAnswer(item)).collect(Collectors.toList());
                 ItemRequestWithItemsResponseDto itemDtoRequestAnswer = requestMapper.toItemRequestDtoOutput(itemRequest, itemsDto);
                 itemRequestWithItemsResponseDtos.add(itemDtoRequestAnswer);
