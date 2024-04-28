@@ -132,7 +132,7 @@ public class ItemServiceImpl implements ItemService {
                 }
             }
             for (Booking booking : allBookings) {
-                if (booking.getItem().getId() == item.getId()) {
+                if (booking.getItem().getId().longValue() == item.getId().longValue()) {
                     bookings.add(booking);
                 }
             }
