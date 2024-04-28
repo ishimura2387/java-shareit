@@ -16,6 +16,7 @@ import ru.practicum.shareit.user.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -82,7 +83,7 @@ public class ItemServiceImpl implements ItemService {
         if (item.getOwner().getId() == userId) {
             List<Long> ids = new ArrayList<>();
             ids.add(itemId);
-            List<Booking> bookings = downloadBooking(ids);
+            List<Booking> bookings = getBooking(ids);
             itemWithDateResponseDto = itemMapper.toItemDtoWithDate(item);
             LocalDateTime localDateTime = LocalDateTime.now();
             Optional<Booking> nextBooking = bookings.stream().filter(booking ->
@@ -98,56 +99,16 @@ public class ItemServiceImpl implements ItemService {
         } else {
             itemWithDateResponseDto = itemMapper.toItemDtoWithDate(item);
         }
-        List<CommentDto> comments = commentRepository.findAllByItemId(item.getId()).stream().map(comment ->
+        List<Long> ids = new ArrayList<>();
+        ids.add(item.getId());
+        List<CommentDto> comments = commentRepository.findAll(ids).stream().map(comment ->
                 commentMapper.fromComment(comment)).collect(Collectors.toList());
         itemWithDateResponseDto.setComments(comments);
         return itemWithDateResponseDto;
     }
 
     @Override
-    public List<ItemWithDateResponseDto> getAllSort(long id, Sort sort) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Ошибка проверки пользователя на наличие в Storage! " +
-                        "Пользователь не найден!"));
-        List<ItemWithDateResponseDto> itemWithDateResponseDtos = new ArrayList<>();
-        List<Item> items = new ArrayList<>();
-        items = itemRepository.getItemsByOwnerId(id, Sort.by(Sort.Direction.ASC, "id"));
-        List<Long> itemIds = new ArrayList<>();
-        for (Item item : items) {
-            itemIds.add(item.getId());
-        }
-        List<Comment> allComments = commentRepository.findAll().stream().filter(comment ->
-                itemIds.contains(comment.getItem().getId())).collect(Collectors.toList());
-        List<Booking> allBookings = downloadBooking(itemIds);
-        for (Item item : items) {
-            ItemWithDateResponseDto itemWithDateResponseDto = itemMapper.toItemDtoWithDate(item);
-            LocalDateTime localDateTime = LocalDateTime.now();
-            Optional<Booking> nextBooking = allBookings.stream().filter(booking ->
-                    booking.getItem().getId() == item.getId()).filter(booking ->
-                    booking.getStart().isAfter(localDateTime)).reduce((a, b) -> b);
-            Optional<Booking> lastBooking = allBookings.stream().filter(booking ->
-                    booking.getItem().getId() == item.getId()).filter(booking ->
-                    booking.getStart().isBefore(localDateTime)).reduce((a, b) -> a);
-            if (!nextBooking.isEmpty()) {
-                itemWithDateResponseDto.setNextBooking(bookingMapper.toBookingDtoShort(nextBooking.get()));
-            }
-            if (!lastBooking.isEmpty()) {
-                itemWithDateResponseDto.setLastBooking(bookingMapper.toBookingDtoShort(lastBooking.get()));
-            }
-            List<CommentDto> comments = new ArrayList<>();
-            for (Comment comment : allComments) {
-                if (comment.getItem().getId() == item.getId()) {
-                    comments.add(commentMapper.fromComment(comment));
-                }
-            }
-            itemWithDateResponseDto.setComments(comments);
-            itemWithDateResponseDtos.add(itemWithDateResponseDto);
-        }
-        return itemWithDateResponseDtos;
-    }
-
-    @Override
-    public List<ItemWithDateResponseDto> getAllPageable(long id, Pageable pageable) {
+    public List<ItemWithDateResponseDto> getAll(long id, Pageable pageable) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Ошибка проверки пользователя на наличие в Storage! " +
                         "Пользователь не найден!"));
@@ -158,17 +119,33 @@ public class ItemServiceImpl implements ItemService {
         for (Item item : items) {
             itemIds.add(item.getId());
         }
-        List<Comment> allComments = commentRepository.findAll().stream().filter(comment ->
-                itemIds.contains(comment.getItem().getId())).collect(Collectors.toList());
-        List<Booking> allBookings = downloadBooking(itemIds);
+        List<Comment> allComments = commentRepository.findAll(itemIds);
+        List<Booking> allBookings = getBooking(itemIds);
+        HashMap<Long, List<CommentDto>> itemComment = new HashMap<>();
+        HashMap<Long, List<Booking>> itemBooking = new HashMap<>();
+        for (Item item : items) {
+            List<CommentDto> comments = new ArrayList<>();
+            List<Booking> bookings = new ArrayList<>();
+            for (Comment comment : allComments) {
+                if (comment.getItem().getId() == item.getId()) {
+                    comments.add(commentMapper.fromComment(comment));
+                }
+            }
+            for (Booking booking : allBookings) {
+                if (booking.getItem().getId() == item.getId()) {
+                    bookings.add(booking);
+                }
+            }
+            itemComment.put(item.getId(),comments);
+            itemBooking.put(item.getId(),bookings);
+        }
         for (Item item : items) {
             ItemWithDateResponseDto itemWithDateResponseDto = itemMapper.toItemDtoWithDate(item);
-            ;
             LocalDateTime localDateTime = LocalDateTime.now();
-            Optional<Booking> nextBooking = allBookings.stream().filter(booking ->
+            Optional<Booking> nextBooking = itemBooking.get(item.getId()).stream().filter(booking ->
                     booking.getItem().getId() == item.getId()).filter(booking ->
                     booking.getStart().isAfter(localDateTime)).reduce((a, b) -> b);
-            Optional<Booking> lastBooking = allBookings.stream().filter(booking ->
+            Optional<Booking> lastBooking = itemBooking.get(item.getId()).stream().filter(booking ->
                     booking.getItem().getId() == item.getId()).filter(booking ->
                     booking.getStart().isBefore(localDateTime)).reduce((a, b) -> a);
             if (!nextBooking.isEmpty()) {
@@ -177,30 +154,14 @@ public class ItemServiceImpl implements ItemService {
             if (!lastBooking.isEmpty()) {
                 itemWithDateResponseDto.setLastBooking(bookingMapper.toBookingDtoShort(lastBooking.get()));
             }
-            List<CommentDto> comments = new ArrayList<>();
-            for (Comment comment : allComments) {
-                if (comment.getItem().getId() == item.getId()) {
-                    comments.add(commentMapper.fromComment(comment));
-                }
-            }
-            itemWithDateResponseDto.setComments(comments);
+            itemWithDateResponseDto.setComments(itemComment.get(item.getId()));
             itemWithDateResponseDtos.add(itemWithDateResponseDto);
         }
         return itemWithDateResponseDtos;
     }
 
     @Override
-    public List<ItemDto> searchSort(String text, Sort sort) {
-        if (text.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<Item> items = new ArrayList<>();
-        items = itemRepository.getItemsForRent(text);
-        return items.stream().map(item -> itemMapper.fromItem(item)).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ItemDto> searchPageable(String text, Pageable pageable) {
+    public List<ItemDto> search(String text, Pageable pageable) {
         if (text.isEmpty()) {
             return Collections.emptyList();
         }
@@ -209,10 +170,9 @@ public class ItemServiceImpl implements ItemService {
         return items.stream().map(item -> itemMapper.fromItem(item)).collect(Collectors.toList());
     }
 
-    private List<Booking> downloadBooking(List<Long> itemIds) {
-        List<Booking> bookings = bookingRepository.findAllByStatusIs(Status.APPROVED,
-                Sort.by(Sort.Direction.DESC, "start")).stream().filter(booking ->
-                itemIds.contains(booking.getItem().getId())).collect(Collectors.toList());
+    private List<Booking> getBooking(List<Long> itemIds) {
+        List<Booking> bookings = bookingRepository.findAll(Status.APPROVED, itemIds,
+                Sort.by(Sort.Direction.DESC, "start"));
         return bookings;
     }
 }

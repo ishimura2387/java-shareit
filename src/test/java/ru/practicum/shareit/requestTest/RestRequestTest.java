@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -46,7 +45,7 @@ public class RestRequestTest {
     private MockMvc mvc;
     LocalDateTime start = LocalDateTime.of(2030, 12, 25, 12, 00, 00);
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy,M,d,H,m");
-    User user = new User(1, "name1", "email1@mail.ru");
+    User user = new User(1L, "name1", "email1@mail.ru");
     ItemRequestDto itemRequestDto = new ItemRequestDto(1, "description 1 request", user, start);
     ItemRequestWithItemsResponseDto itemRequestWithItemsResponseDto = new ItemRequestWithItemsResponseDto(1, "description 1 requestOutput", start, null);
 
@@ -102,28 +101,9 @@ public class RestRequestTest {
     }
 
     @Test
-    void getItemRequestsSortTest() throws Exception {
-        itemRequestWithItemsResponseDtoList.add(itemRequestWithItemsResponseDto);
-        when(requestService.getAllOtherSort(any(Long.class), any(Sort.class)))
-                .thenReturn(List.of(itemRequestWithItemsResponseDto));
-        mvc.perform(get("/requests/all")
-                        .content(mapper.writeValueAsString(itemRequestWithItemsResponseDtoList))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.[0].id", is(itemRequestWithItemsResponseDto.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].description", is(itemRequestWithItemsResponseDto.getDescription())))
-                .andExpect(jsonPath("$.[0].created").value(Arrays.stream(itemRequestWithItemsResponseDto.getCreated().format(dtf)
-                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())));
-    }
-
-    @Test
     void getItemRequestsPageableTest() throws Exception {
         itemRequestWithItemsResponseDtoList.add(itemRequestWithItemsResponseDto);
-        when(requestService.getAllOtherPageable(any(Long.class), any(Pageable.class)))
+        when(requestService.getAllOther(any(Long.class), any(Pageable.class)))
                 .thenReturn(List.of(itemRequestWithItemsResponseDto));
         mvc.perform(get("/requests/all?from=1&size=2")
                         .content(mapper.writeValueAsString(itemRequestWithItemsResponseDtoList))

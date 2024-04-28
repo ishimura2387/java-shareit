@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -12,14 +11,9 @@ public interface ItemService {
 
     ItemWithDateResponseDto get(long itemId, long userId);
 
+    List<ItemWithDateResponseDto> getAll(long id, Pageable pageable);
 
-    List<ItemWithDateResponseDto> getAllSort(long id, Sort sort);
-
-    List<ItemWithDateResponseDto> getAllPageable(long id, Pageable pageable);
-
-    List<ItemDto> searchSort(String text, Sort sort);
-
-    List<ItemDto> searchPageable(String text, Pageable pageable);
+    List<ItemDto> search(String text, Pageable pageable);
 
     CommentDto addComment(CommentDto commentDto, long userId, long itemId);
 }

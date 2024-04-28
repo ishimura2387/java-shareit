@@ -21,8 +21,8 @@ public class ItemRepositoryTest {
     private ItemRepository itemRepository;
     @Autowired
     private UserRepository userRepository;
-    User user = new User(1, "user1", "user1@mail.ru");
-    Item item = new Item(1, "item1", "description item 1", true, user, null);
+    User user = new User(1L, "user1", "user1@mail.ru");
+    Item item = new Item(1L, "item1", "description item 1", true, user, null);
 
 
     @Test

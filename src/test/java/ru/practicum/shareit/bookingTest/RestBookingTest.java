@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -132,33 +131,9 @@ public class RestBookingTest {
     }
 
     @Test
-    void getBookingsByUserSortTest() throws Exception {
-        bookingDtos.add(bookingDto);
-        when(bookingService.getAllByUserSort(any(Long.class), any(String.class),
-                any(Sort.class)))
-                .thenReturn(List.of(bookingDto));
-        mvc.perform(get("/bookings")
-                        .content(mapper.writeValueAsString(bookingDtos))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.[0].id", is(bookingDto.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].start").value(Arrays.stream(bookingDto.getStart().format(dtf)
-                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
-                .andExpect(jsonPath("$.[0].end").value(Arrays.stream(bookingDto.getEnd().format(dtf)
-                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
-                .andExpect(jsonPath("$.[0].item.id", is(bookingDto.getItem().getId()), Long.class))
-                .andExpect(jsonPath("$.[0].booker.id", is(bookingDto.getBooker().getId()), Long.class))
-                .andExpect(jsonPath("$.[0].status", is(bookingDto.getStatus().toString())));
-    }
-
-    @Test
     void getBookingsByUserPageableTest() throws Exception {
         bookingDtos.add(bookingDto);
-        when(bookingService.getAllByUserPageable(any(Long.class), any(String.class),
+        when(bookingService.getAllByUser(any(Long.class), any(String.class),
                 any(Pageable.class)))
                 .thenReturn(List.of(bookingDto));
         mvc.perform(get("/bookings?from=1&size=2")
@@ -180,33 +155,9 @@ public class RestBookingTest {
     }
 
     @Test
-    void getBookingsByOwnerSortTest() throws Exception {
-        bookingDtos.add(bookingDto);
-        when(bookingService.getAllByOwnerSort(any(Long.class), any(String.class),
-                any(Sort.class)))
-                .thenReturn(List.of(bookingDto));
-        mvc.perform(get("/bookings/owner")
-                        .content(mapper.writeValueAsString(bookingDtos))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.[0].id", is(bookingDto.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].start").value(Arrays.stream(bookingDto.getStart().format(dtf)
-                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
-                .andExpect(jsonPath("$.[0].end").value(Arrays.stream(bookingDto.getEnd().format(dtf)
-                                .split(",")).map(i -> Integer.parseInt(i)).collect(Collectors.toList())))
-                .andExpect(jsonPath("$.[0].item.id", is(bookingDto.getItem().getId()), Long.class))
-                .andExpect(jsonPath("$.[0].booker.id", is(bookingDto.getBooker().getId()), Long.class))
-                .andExpect(jsonPath("$.[0].status", is(bookingDto.getStatus().toString())));
-    }
-
-    @Test
     void getBookingsByOwnerPageableTest() throws Exception {
         bookingDtos.add(bookingDto);
-        when(bookingService.getAllByOwnerPageable(any(Long.class), any(String.class),
+        when(bookingService.getAllByOwner(any(Long.class), any(String.class),
                 any(Pageable.class)))
                 .thenReturn(List.of(bookingDto));
         mvc.perform(get("/bookings/owner?from=1&size=2")

@@ -64,35 +64,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<ItemRequestWithItemsResponseDto> getAllOtherSort(long userId, Sort sort) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Ошибка проверки пользователя на наличие в Storage! " +
-                        "Пользователь не найден!"));
-        List<ItemRequestWithItemsResponseDto> itemRequestWithItemsResponseDtos = new ArrayList<>();
-        List<ItemRequest> request = new ArrayList<>();
-        request = requestRepository.findAllByRequestorIdNotZeroSize(userId).stream().collect(Collectors.toList());
-        List<Long> ids = new ArrayList<>();
-        for (ItemRequest itemRequest : request) {
-            ids.add(itemRequest.getId());
-        }
-        List<Item> items = itemRepository.findAllByRequestIdIn(ids);
-        if (items.size() > 0) {
-            for (ItemRequest itemRequest : request) {
-                List<ItemWithRequestResponseDto> itemsDto = items.stream().filter(item ->
-                                item.getRequest().getId() == itemRequest.getId()).map(item ->
-                        itemMapper.toItemDtoRequestAnswer(item)).collect(Collectors.toList());
-                ItemRequestWithItemsResponseDto itemDtoRequestAnswer = requestMapper.toItemRequestDtoOutput(itemRequest, itemsDto);
-                itemRequestWithItemsResponseDtos.add(itemDtoRequestAnswer);
-            }
-        } else {
-            itemRequestWithItemsResponseDtos = request.stream().map(itemRequest ->
-                            requestMapper.toItemRequestDtoOutputNullRequest(itemRequest)).collect(Collectors.toList());
-        }
-        return itemRequestWithItemsResponseDtos;
-    }
-
-    @Override
-    public List<ItemRequestWithItemsResponseDto> getAllOtherPageable(long userId, Pageable pageable) {
+    public List<ItemRequestWithItemsResponseDto> getAllOther(long userId, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Ошибка проверки пользователя на наличие в Storage! " +
                         "Пользователь не найден!"));

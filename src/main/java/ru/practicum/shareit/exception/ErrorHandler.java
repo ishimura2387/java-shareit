@@ -15,49 +15,45 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleValidationNotFoundException(final NotFoundException e) {
-        log.debug("NotFoundException: %s ", e.getMessage());
+    public ErrorResponse handleNotFoundException(final NotFoundException e) {
+        log.info("NotFoundException: {}");
         StackTraceElement[] trace = e.getStackTrace();
-        System.err.println(trace[0].toString());
         System.out.println(trace[0].getClass());
         System.out.println(trace[0].getMethodName());
         System.out.println(trace[0].getFileName());
         System.out.println(trace[0].getLineNumber());
-        return new ErrorResponse(String.format("ошибка поиска объекта: %s ", e.getMessage()));
+        return new ErrorResponse(String.format(e.getMessage()));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleDataIntegrityViolationException(final DataIntegrityViolationException e) {
+        log.info("DataIntegrityViolationException: {}");
+        StackTraceElement[] trace = e.getStackTrace();
+        System.out.println(trace[0].getClass());
+        System.out.println(trace[0].getMethodName());
+        System.out.println(trace[0].getFileName());
+        System.out.println(trace[0].getLineNumber());
+        return new ErrorResponse(String.format(e.getMessage()));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleValidationDataIntegrityViolationException(final DataIntegrityViolationException e) {
-        log.debug("DataIntegrityViolationException: %s ", e.getMessage());
+    public ErrorResponse handleConstraintViolationException(final ConstraintViolationException e) {
+        log.error("ConstraintViolationException: {}");
         StackTraceElement[] trace = e.getStackTrace();
-        System.err.println(trace[0].toString());
         System.out.println(trace[0].getClass());
         System.out.println(trace[0].getMethodName());
         System.out.println(trace[0].getFileName());
         System.out.println(trace[0].getLineNumber());
-        return new ErrorResponse(String.format("ошибка валидации email: %s ", e.getMessage()));
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleValidationConstraintViolationException(final ConstraintViolationException e) {
-        log.debug("ConstraintViolationException: %s ", e.getMessage());
-        StackTraceElement[] trace = e.getStackTrace();
-        System.err.println(trace[0].toString());
-        System.out.println(trace[0].getClass());
-        System.out.println(trace[0].getMethodName());
-        System.out.println(trace[0].getFileName());
-        System.out.println(trace[0].getLineNumber());
-        return new ErrorResponse(String.format("ошибка валидации пагинации: %s ", e.getMessage()));
+        return new ErrorResponse(String.format(e.getMessage()));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleIllegalArgumentException(final IllegalArgumentException e) {
-        log.debug("IllegalArgumentException: %s ", e.getMessage());
+        log.info("IllegalArgumentException: {}");
         StackTraceElement[] trace = e.getStackTrace();
-        System.err.println(trace[0].toString());
         System.out.println(trace[0].getClass());
         System.out.println(trace[0].getMethodName());
         System.out.println(trace[0].getFileName());

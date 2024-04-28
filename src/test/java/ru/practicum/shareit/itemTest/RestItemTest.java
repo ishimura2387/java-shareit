@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -142,28 +141,9 @@ public class RestItemTest {
     }
 
     @Test
-    void getItemsForRentSortTest() throws Exception {
-        itemDtos.add(itemDto);
-        when(itemService.searchSort(any(String.class), any(Sort.class)))
-                .thenReturn(List.of(itemDto));
-        mvc.perform(get("/items/search?text=description")
-                        .content(mapper.writeValueAsString(itemDtos))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.[0].id", is(itemDto.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].name", is(itemDto.getName())))
-                .andExpect(jsonPath("$.[0].description", is(itemDto.getDescription())))
-                .andExpect(jsonPath("$.[0].available", is(itemDto.getAvailable())));
-    }
-
-    @Test
     void getItemsForRentPageableTest() throws Exception {
         itemDtos.add(itemDto);
-        when(itemService.searchPageable(any(String.class), any(Pageable.class)))
+        when(itemService.search(any(String.class), any(Pageable.class)))
                 .thenReturn(List.of(itemDto));
         mvc.perform(get("/items/search?text=description?from=1&size=2")
                         .content(mapper.writeValueAsString(itemDtos))
@@ -180,28 +160,9 @@ public class RestItemTest {
     }
 
     @Test
-    void getMyItemsSortTest() throws Exception {
-        itemWithDateResponseDtos.add(itemWithDateResponseDto);
-        when(itemService.getAllSort(any(Long.class), any(Sort.class)))
-                .thenReturn(List.of(itemWithDateResponseDto));
-        mvc.perform(get("/items")
-                        .content(mapper.writeValueAsString(itemWithDateResponseDtos))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.[0].id", is(itemWithDateResponseDto.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].name", is(itemWithDateResponseDto.getName())))
-                .andExpect(jsonPath("$.[0].description", is(itemWithDateResponseDto.getDescription())))
-                .andExpect(jsonPath("$.[0].available", is(itemWithDateResponseDto.getAvailable())));
-    }
-
-    @Test
     void getMyItemsPageableTest() throws Exception {
         itemWithDateResponseDtos.add(itemWithDateResponseDto);
-        when(itemService.getAllPageable(any(Long.class), any(Pageable.class)))
+        when(itemService.getAll(any(Long.class), any(Pageable.class)))
                 .thenReturn(List.of(itemWithDateResponseDto));
         mvc.perform(get("/items?from=1&size=2")
                         .content(mapper.writeValueAsString(itemWithDateResponseDtos))

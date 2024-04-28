@@ -36,9 +36,9 @@ public class RequestServiceTest {
             true, null, 0);
     private ItemDto itemDto2 = new ItemDto(2, "item 2", "description item 2",
             false, null, 1);
-    private User user = new User(1, "user not dto 1", "userNotDto1@mail.ru");
+    private User user = new User(1L, "user not dto 1", "userNotDto1@mail.ru");
 
-    private User user2 = new User(2, "user not dto 2", "userNotDto2@mail.ru");
+    private User user2 = new User(2L, "user not dto 2", "userNotDto2@mail.ru");
     private ItemRequestDto itemRequestDto = new ItemRequestDto(1, "description 1 request", user, LocalDateTime.now());
 
     Sort sort = Sort.by(Sort.Direction.DESC, "created");
@@ -131,7 +131,7 @@ public class RequestServiceTest {
     void getAllRequestWrongUserTest() {
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> {
-                    requestService.getAllOtherPageable(1, pageable);
+                    requestService.getAllOther(1, pageable);
                 },
                 "Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!");
         Assertions.assertEquals("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!", exception.getMessage());
@@ -147,44 +147,9 @@ public class RequestServiceTest {
         requestService.add(1, itemRequestDto);
         requestService.add(2, itemRequestDto2);
         requestService.add(2, itemRequestDto3);
-        List<ItemRequestWithItemsResponseDto> requestDtoOutputs = requestService.getAllOtherPageable(1, pageable);
+        List<ItemRequestWithItemsResponseDto> requestDtoOutputs = requestService.getAllOther(1, pageable);
         Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto3.getId());
         Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto3.getDescription());
-    }
-
-    @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getAllRequestSortTest() {
-        userService.add(userDto1);
-        userService.add(userDto2);
-        ItemRequestDto itemRequestDto2 = new ItemRequestDto(2, "description 2 request", user2, LocalDateTime.now());
-        ItemRequestDto itemRequestDto3 = new ItemRequestDto(3, "description 3request", user, LocalDateTime.now());
-        requestService.add(1, itemRequestDto);
-        requestService.add(2, itemRequestDto2);
-        requestService.add(1, itemRequestDto3);
-        List<ItemRequestWithItemsResponseDto> requestDtoOutputs = requestService.getAllOtherSort(1, sort);
-        Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto2.getId());
-        Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto2.getDescription());
-    }
-
-    @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getAllRequestOtherSortTest() {
-        userService.add(userDto1);
-        userService.add(userDto2);
-        ItemRequestDto itemRequestDto2 = new ItemRequestDto(2, "description 2 request", user2, LocalDateTime.now());
-        ItemRequestDto itemRequestDto3 = new ItemRequestDto(3, "description 3 request", user, LocalDateTime.now());
-        requestService.add(1, itemRequestDto);
-        requestService.add(2, itemRequestDto2);
-        requestService.add(1, itemRequestDto3);
-        ItemDto itemDto3 = new ItemDto(3, "item 3", "description item 2",
-                false, null, 3);
-        itemService.add(itemDto1, 1);
-        itemService.add(itemDto2,2);
-        itemService.add(itemDto3,2);
-        List<ItemRequestWithItemsResponseDto> requestDtoOutputs = requestService.getAllOtherSort(2, sort);
-        Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto.getId());
-        Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto.getDescription());
     }
 
     @Test
@@ -202,7 +167,7 @@ public class RequestServiceTest {
         itemService.add(itemDto1, 1);
         itemService.add(itemDto2,2);
         itemService.add(itemDto3,2);
-        List<ItemRequestWithItemsResponseDto> requestDtoOutputs = requestService.getAllOtherPageable(2, pageable);
+        List<ItemRequestWithItemsResponseDto> requestDtoOutputs = requestService.getAllOther(2, pageable);
         Assertions.assertEquals(requestDtoOutputs.get(0).getId(), itemRequestDto3.getId());
         Assertions.assertEquals(requestDtoOutputs.get(0).getDescription(), itemRequestDto3.getDescription());
     }

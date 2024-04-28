@@ -22,8 +22,8 @@ public class RequestRepositoryTest {
     private RequestRepository requestRepository;
     @Autowired
     private UserRepository userRepository;
-    User user = new User(1, "user1", "user1@mail.ru");
-    ItemRequest itemRequest = new ItemRequest(1, "description request 1", user, LocalDateTime.now());
+    User user = new User(1L, "user1", "user1@mail.ru");
+    ItemRequest itemRequest = new ItemRequest(1L, "description request 1", user, LocalDateTime.now());
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)

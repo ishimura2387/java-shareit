@@ -1,7 +1,10 @@
 package ru.practicum.shareit.item;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.context.annotation.Lazy;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.Entity;
@@ -17,13 +20,16 @@ import java.time.LocalDateTime;
 @Table(name = "comments", schema = "public")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String text;
     @ManyToOne
     @JoinColumn(name = "item_id")
+    @Lazy
     private Item item;
     @ManyToOne
     @JoinColumn(name = "author_id")

@@ -172,50 +172,6 @@ public class ItemServiceTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getAllItemsWrongUserTest() {
-        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
-                () -> {
-                    itemService.getAllSort(1, sort);
-                },
-                "Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!");
-        Assertions.assertEquals("Ошибка проверки пользователя на наличие в Storage! Пользователь не найден!", exception.getMessage());
-    }
-
-    @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getAllItemsWithSortTest() {
-        userService.add(userDto1);
-        itemService.add(itemDto1, 1);
-        List<ItemWithDateResponseDto> itemWithDateResponseDtos = itemService.getAllSort(1, sort);
-        Assertions.assertEquals(itemWithDateResponseDtos.get(0).getId(), itemDto1.getId());
-        Assertions.assertEquals(itemWithDateResponseDtos.get(0).getName(), itemDto1.getName());
-        Assertions.assertEquals(itemWithDateResponseDtos.get(0).getDescription(), itemDto1.getDescription());
-    }
-
-    @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getAllItemsWithSortWithBookingTest() throws InterruptedException {
-        userService.add(userDto1);
-        userService.add(userDto2);
-        itemService.add(itemDto1, 1);
-        LocalDateTime start = LocalDateTime.now();
-        BookingInputDto bookingDto1 = new BookingInputDto(1, 1, start.plusSeconds(1),  start.plusSeconds(2));
-        BookingInputDto bookingDto2 = new BookingInputDto(2, 1, start.plusSeconds(50),  start.plusSeconds(55));
-        bookingService.add(bookingDto1, 2);
-        bookingService.add(bookingDto2, 2);
-        bookingService.setStatus(1,true, 1);
-        bookingService.setStatus(2,true, 1);
-        CommentDto commentDto = new CommentDto(1, "text", "name", LocalDateTime.now());
-        TimeUnit.SECONDS.sleep(3);
-        itemService.addComment(commentDto, 2, 1);
-        List<ItemWithDateResponseDto> itemWithDateResponseDtos = itemService.getAllSort(1, sort);
-        Assertions.assertEquals(itemWithDateResponseDtos.get(0).getId(), itemDto1.getId());
-        Assertions.assertEquals(itemWithDateResponseDtos.get(0).getName(), itemDto1.getName());
-        Assertions.assertEquals(itemWithDateResponseDtos.get(0).getDescription(), itemDto1.getDescription());
-    }
-
-    @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getItemWithBookingTest() throws InterruptedException {
         userService.add(userDto1);
         userService.add(userDto2);
@@ -241,7 +197,7 @@ public class ItemServiceTest {
     void getAllItemsWithPaginationTest() {
         userService.add(userDto1);
         itemService.add(itemDto1, 1);
-        List<ItemWithDateResponseDto> itemWithDateResponseDtos = itemService.getAllPageable(1, pageable);
+        List<ItemWithDateResponseDto> itemWithDateResponseDtos = itemService.getAll(1, pageable);
         Assertions.assertEquals(itemWithDateResponseDtos.get(0).getId(), itemDto1.getId());
         Assertions.assertEquals(itemWithDateResponseDtos.get(0).getName(), itemDto1.getName());
         Assertions.assertEquals(itemWithDateResponseDtos.get(0).getDescription(), itemDto1.getDescription());
@@ -253,18 +209,7 @@ public class ItemServiceTest {
     void getItemsForRentPageableTest() {
         userService.add(userDto1);
         itemService.add(itemDto1, 1);
-        List<ItemDto> itemDto = itemService.searchPageable("item", pageable);
-        Assertions.assertEquals(itemDto.get(0).getId(), itemDto1.getId());
-        Assertions.assertEquals(itemDto.get(0).getName(), itemDto1.getName());
-        Assertions.assertEquals(itemDto.get(0).getDescription(), itemDto1.getDescription());
-    }
-
-    @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getItemsForRentSortTest() {
-        userService.add(userDto1);
-        itemService.add(itemDto1, 1);
-        List<ItemDto> itemDto = itemService.searchSort("item", sort);
+        List<ItemDto> itemDto = itemService.search("item", pageable);
         Assertions.assertEquals(itemDto.get(0).getId(), itemDto1.getId());
         Assertions.assertEquals(itemDto.get(0).getName(), itemDto1.getName());
         Assertions.assertEquals(itemDto.get(0).getDescription(), itemDto1.getDescription());
@@ -286,7 +231,7 @@ public class ItemServiceTest {
         bookingService.setStatus(2,true, 1);
         TimeUnit.SECONDS.sleep(3);
         itemService.addComment(commentDto, 2, 1);
-        List<ItemWithDateResponseDto> itemWithDateResponseDtos = itemService.getAllPageable(1, pageable);
+        List<ItemWithDateResponseDto> itemWithDateResponseDtos = itemService.getAll(1, pageable);
         Assertions.assertEquals(itemWithDateResponseDtos.get(0).getId(), itemDto1.getId());
         Assertions.assertEquals(itemWithDateResponseDtos.get(0).getName(), itemDto1.getName());
         Assertions.assertEquals(itemWithDateResponseDtos.get(0).getDescription(), itemDto1.getDescription());

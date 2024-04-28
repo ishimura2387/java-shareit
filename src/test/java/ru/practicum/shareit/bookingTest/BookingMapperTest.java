@@ -25,10 +25,10 @@ import java.time.LocalDateTime;
 public class BookingMapperTest {
     private final BookingMapper bookingMapper;
     private UserDto userDto = new UserDto(1, "user1", "user1@mail.ru");
-    private User user = new User(2, "user2", "user2@mail.ru");
+    private User user = new User(2L, "user2", "user2@mail.ru");
     private ItemDto itemDto = new ItemDto(1, "item 1", "description item 1",
             true, null, 0);
-    private Item item = new Item(2, "item 2", "description item 2",
+    private Item item = new Item(2L, "item 2", "description item 2",
             false, null, null);
 
     @Test
@@ -52,7 +52,7 @@ public class BookingMapperTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void fromBookingTest() {
         LocalDateTime start = LocalDateTime.now();
-        Booking booking = new Booking(1, start.plusSeconds(1), start.plusSeconds(2),  item, user, Status.WAITING);
+        Booking booking = new Booking(1L, start.plusSeconds(1), start.plusSeconds(2),  item, user, Status.WAITING);
         BookingDto bookingNull = bookingMapper.fromBooking(null);
         Assertions.assertNull(bookingNull);
         BookingDto bookingDto = bookingMapper.fromBooking(booking);
@@ -70,7 +70,7 @@ public class BookingMapperTest {
     void bookingUpdateNullTest() {
         LocalDateTime start = LocalDateTime.now();
         BookingDto bookingDto = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2),  itemDto, userDto, Status.WAITING);
-        Booking booking = new Booking(2, start.plusSeconds(3), start.plusSeconds(4),  item, user, Status.WAITING);
+        Booking booking = new Booking(2L, start.plusSeconds(3), start.plusSeconds(4),  item, user, Status.WAITING);
         Booking booking2 = bookingMapper.updateBooking(null, booking);
         Assertions.assertEquals(booking2.getId(), booking.getId());
         Assertions.assertEquals(booking2.getStart(), booking.getStart());
@@ -85,7 +85,7 @@ public class BookingMapperTest {
     void bookingUpdateTest() {
         LocalDateTime start = LocalDateTime.now();
         BookingDto bookingDto = new BookingDto(1, start.plusSeconds(1), start.plusSeconds(2),  itemDto, userDto, Status.REJECTED);
-        Booking booking = new Booking(2, start.plusSeconds(3), start.plusSeconds(4),  item, user, Status.WAITING);
+        Booking booking = new Booking(2L, start.plusSeconds(3), start.plusSeconds(4),  item, user, Status.WAITING);
         Booking booking2 = bookingMapper.updateBooking(bookingDto, booking);
         Assertions.assertEquals(booking2.getId(), bookingDto.getId());
         Assertions.assertEquals(booking2.getStart(), bookingDto.getStart());
@@ -99,7 +99,7 @@ public class BookingMapperTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void toBookingDtoShortTest() {
         LocalDateTime start = LocalDateTime.now();
-        Booking booking = new Booking(1, start.plusSeconds(1), start.plusSeconds(2),  item, user, Status.WAITING);
+        Booking booking = new Booking(1L, start.plusSeconds(1), start.plusSeconds(2),  item, user, Status.WAITING);
         BookingShortResponseDto bookingNull = bookingMapper.toBookingDtoShort(null);
         Assertions.assertNull(bookingNull);
         BookingShortResponseDto bookingShortResponseDto = bookingMapper.toBookingDtoShort(booking);

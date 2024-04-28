@@ -2,7 +2,6 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.Item;
@@ -27,7 +26,8 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto add(BookingInputDto bookingInputDto, long userId) {
         Booking booking = bookingMapper.fromBookingDtoInput(bookingInputDto);
         Item item = itemRepository.findById(booking.getItem().getId())
-                .orElseThrow(() -> new NotFoundException("Ошибка проверки вещи на наличие в Storage! Вещь не найдена!"));
+                .orElseThrow(() ->
+                        new NotFoundException("Ошибка проверки вещи на наличие в Storage! Вещь не найдена!"));
         booking.setItem(item);
         User booker = userRepository.findById(userId)
                         .orElseThrow(() -> new NotFoundException("Ошибка проверки пользователя на наличие в Storage! " +
@@ -49,7 +49,7 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("На данное время уже есть бронирование!");
         }
         booking.setStatus(Status.WAITING);
-        bookingRepository.save(booking);
+        booking = bookingRepository.save(booking);
         return bookingMapper.fromBooking(booking);
     }
 
@@ -83,39 +83,7 @@ public class BookingServiceImpl implements BookingService {
         return bookingMapper.fromBooking(booking);
     }
 
-    public List<BookingDto> getAllByUserSort(long userId, String state, Sort sort) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Ошибка проверки пользователя на наличие в Storage! " +
-                        "Пользователь не найден!"));
-        if (!Arrays.stream(State.values()).anyMatch(e -> e.name().equals(state))) {
-            throw new IllegalArgumentException("Unknown state: " + state);
-        }
-        List<Booking> bookings = new ArrayList<>();
-        switch (state.toUpperCase()) {
-            case "CURRENT":
-                LocalDateTime time = LocalDateTime.now();
-                bookings = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfter(userId, time, time, sort);
-                break;
-            case "PAST":
-                bookings = bookingRepository.findAllByBookerIdAndEndBefore(userId, LocalDateTime.now(), sort);
-                break;
-            case "FUTURE":
-                bookings = bookingRepository.findAllByBookerIdAndStartAfter(userId, LocalDateTime.now(), sort);
-                break;
-            case "WAITING":
-                bookings = bookingRepository.findAllByBookerIdAndStatusIs(userId, Status.WAITING, sort);
-                break;
-            case "REJECTED":
-                bookings = bookingRepository.findAllByBookerIdAndStatusIs(userId, Status.REJECTED, sort);
-                break;
-            default:
-                bookings = bookingRepository.findAllByBookerId(userId, sort);
-                break;
-        }
-        return bookings.stream().map(booking -> bookingMapper.fromBooking(booking)).collect(Collectors.toList());
-    }
-
-    public List<BookingDto> getAllByUserPageable(long userId, String state, Pageable pageable) {
+    public List<BookingDto> getAllByUser(long userId, String state, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Ошибка проверки пользователя на наличие в Storage! " +
                         "Пользователь не найден!"));
@@ -147,39 +115,7 @@ public class BookingServiceImpl implements BookingService {
         return bookings.stream().map(booking -> bookingMapper.fromBooking(booking)).collect(Collectors.toList());
     }
 
-    public List<BookingDto> getAllByOwnerSort(long ownerId, String state, Sort sort) {
-        User owner = userRepository.findById(ownerId)
-                .orElseThrow(() -> new NotFoundException("Ошибка проверки пользователя на наличие в Storage! " +
-                        "Пользователь не найден!"));
-        if (!Arrays.stream(State.values()).anyMatch(e -> e.name().equals(state))) {
-            throw new IllegalArgumentException("Unknown state: " + state);
-        }
-        List<Booking> bookings = new ArrayList<>();
-        switch (state.toUpperCase()) {
-            case "CURRENT":
-                LocalDateTime time = LocalDateTime.now();
-                bookings = bookingRepository.findAllByItem_OwnerIdAndStartBeforeAndEndAfter(ownerId, time, time, sort);
-                break;
-            case "PAST":
-                bookings = bookingRepository.findAllByItem_OwnerIdAndAndEndBefore(ownerId, LocalDateTime.now(), sort);
-                break;
-            case "FUTURE":
-                bookings = bookingRepository.findAllByItem_OwnerIdAndStartAfter(ownerId, LocalDateTime.now(), sort);
-                break;
-            case "WAITING":
-                bookings = bookingRepository.findAllByItem_OwnerIdAndStatusIs(ownerId, Status.WAITING, sort);
-                break;
-            case "REJECTED":
-                bookings = bookingRepository.findAllByItem_OwnerIdAndStatusIs(ownerId, Status.REJECTED, sort);
-                break;
-            default:
-                bookings = bookingRepository.findAllByItem_OwnerId(ownerId, sort);
-                break;
-        }
-        return bookings.stream().map(booking -> bookingMapper.fromBooking(booking)).collect(Collectors.toList());
-    }
-
-    public List<BookingDto> getAllByOwnerPageable(long ownerId, String state, Pageable pageable) {
+    public List<BookingDto> getAllByOwner(long ownerId, String state, Pageable pageable) {
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new NotFoundException("Ошибка проверки пользователя на наличие в Storage! " +
                         "Пользователь не найден!"));
