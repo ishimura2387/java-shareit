@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Component
 public class RequestMapper {
-    public ItemRequest toItemRequest(ru.practicum.shareit.request.ItemRequestDto itemRequestDto, User requestor) {
+    public ItemRequest toItemRequest(ItemRequestDto itemRequestDto, User requestor) {
         ItemRequest itemRequest = new ItemRequest();
         itemRequest.setDescription(itemRequestDto.getDescription());
         itemRequest.setRequestor(requestor);
@@ -22,7 +22,7 @@ public class RequestMapper {
     }
 
     public ru.practicum.shareit.request.ItemRequestDto toItemRequestDto(ItemRequest itemRequest) {
-        ru.practicum.shareit.request.ItemRequestDto itemRequestDto = new ru.practicum.shareit.request.ItemRequestDto();
+        ItemRequestDto itemRequestDto = new ru.practicum.shareit.request.ItemRequestDto();
         itemRequestDto.setId(itemRequest.getId());
         itemRequestDto.setDescription(itemRequest.getDescription());
         itemRequestDto.setRequestor(itemRequest.getRequestor());

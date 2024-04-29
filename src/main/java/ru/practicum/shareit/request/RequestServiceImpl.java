@@ -14,6 +14,7 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,16 +44,23 @@ public class RequestServiceImpl implements RequestService {
         List<ItemRequest> requests = requestRepository.findAllByRequestorId(userId, Sort.by(Sort.Direction.ASC,
                 "created"));
         List<Long> ids = new ArrayList<>();
+        HashMap<Long, List<Item>> itemRequestItems = new HashMap<>();
         for (ItemRequest itemRequest : requests) {
             ids.add(itemRequest.getId());
+            itemRequestItems.put(itemRequest.getId(), new ArrayList<Item>());
         }
         List<ItemRequestWithItemsResponseDto> itemRequestWithItemsResponseDtos = new ArrayList<>();
         List<Item> items = itemRepository.findAllByRequestIdIn(ids);
         if (items.size() > 0) {
+            for (Item item : items) {
+                Long idRequest = item.getRequest().getId();
+                List<Item> list = itemRequestItems.get(idRequest);
+                list.add(item);
+                itemRequestItems.replace(idRequest, list);
+            }
             for (ItemRequest itemRequest : requests) {
-                List<ItemWithRequestResponseDto> itemsDto = items.stream().filter(item ->
-                                item.getRequest().getId().longValue() == itemRequest.getId().longValue())
-                        .map(item -> itemMapper.toItemDtoRequestAnswer(item)).collect(Collectors.toList());
+                List<ItemWithRequestResponseDto> itemsDto = itemRequestItems.get(itemRequest.getId()).stream().map(item ->
+                        itemMapper.toItemDtoRequestAnswer(item)).collect(Collectors.toList());
                 ItemRequestWithItemsResponseDto itemDtoRequestAnswer = requestMapper.toItemRequestDtoOutput(itemRequest, itemsDto);
                 itemRequestWithItemsResponseDtos.add(itemDtoRequestAnswer);
             }
@@ -73,14 +81,21 @@ public class RequestServiceImpl implements RequestService {
         Page<ItemRequest> pages = requestRepository.findAllByRequestorIdNot(userId, pageable);
         request = pages.get().collect(Collectors.toList());
         List<Long> ids = new ArrayList<>();
+        HashMap<Long, List<Item>> itemRequestItems = new HashMap<>();
         for (ItemRequest itemRequest : request) {
             ids.add(itemRequest.getId());
+            itemRequestItems.put(itemRequest.getId(), new ArrayList<Item>());
         }
         List<Item> items = itemRepository.findAllByRequestIdIn(ids);
         if (items.size() > 0) {
+            for (Item item : items) {
+                Long idRequest = item.getRequest().getId();
+                List<Item> list = itemRequestItems.get(idRequest);
+                list.add(item);
+                itemRequestItems.replace(idRequest, list);
+            }
             for (ItemRequest itemRequest : request) {
-                List<ItemWithRequestResponseDto> itemsDto = items.stream().filter(item ->
-                                item.getRequest().getId().longValue() == itemRequest.getId().longValue()).map(item ->
+                List<ItemWithRequestResponseDto> itemsDto = itemRequestItems.get(itemRequest.getId()).stream().map(item ->
                         itemMapper.toItemDtoRequestAnswer(item)).collect(Collectors.toList());
                 ItemRequestWithItemsResponseDto itemDtoRequestAnswer = requestMapper.toItemRequestDtoOutput(itemRequest, itemsDto);
                 itemRequestWithItemsResponseDtos.add(itemDtoRequestAnswer);

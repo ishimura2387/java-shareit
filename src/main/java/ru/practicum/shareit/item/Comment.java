@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.context.annotation.Lazy;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.Entity;
@@ -29,7 +28,6 @@ public class Comment {
     private String text;
     @ManyToOne
     @JoinColumn(name = "item_id")
-    @Lazy
     private Item item;
     @ManyToOne
     @JoinColumn(name = "author_id")
