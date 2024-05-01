@@ -54,9 +54,9 @@ public class ItemRequestController {
         log.debug("Обработка запроса GET/requests/all");
         List<ItemRequestWithItemsResponseDto> itemRequests = new ArrayList<>();
         Sort sort = Sort.by(Sort.Direction.DESC, "created");
-            int page = from / size;
-            Pageable pageable = PageRequest.of(page, size, sort);
-            itemRequests = requestServiceImpl.getAllOther(userId, pageable);
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size, sort);
+        itemRequests = requestServiceImpl.getAllOther(userId, pageable);
         log.debug("Получен список с размером: {}", itemRequests.size());
         return itemRequests;
     }

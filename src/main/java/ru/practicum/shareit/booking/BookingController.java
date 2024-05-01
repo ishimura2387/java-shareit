@@ -64,9 +64,9 @@ public class BookingController {
         log.debug("Обработка запроса GET/bookings");
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
         List<BookingDto> bookingDto = new ArrayList<>();
-            int page = from / size;
-            Pageable pageable = PageRequest.of(page, size, sort);
-            bookingDto = bookingServiceImpl.getAllByUser(userId, state, pageable);
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size, sort);
+        bookingDto = bookingServiceImpl.getAllByUser(userId, state, pageable);
         log.debug("Получен список с размером: {}", bookingDto.size());
         return bookingDto;
     }
@@ -79,9 +79,9 @@ public class BookingController {
         log.debug("Обработка запроса GET/bookings/owner");
         List<BookingDto> bookingDto = new ArrayList<>();
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
-            int page = from / size;
-            Pageable pageable = PageRequest.of(page, size, sort);
-            bookingDto = bookingServiceImpl.getAllByOwner(userId, state, pageable);
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size, sort);
+        bookingDto = bookingServiceImpl.getAllByOwner(userId, state, pageable);
         log.debug("Получен список с размером: {}", bookingDto.size());
         return bookingDto;
     }

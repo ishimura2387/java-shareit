@@ -72,9 +72,9 @@ public class ItemController {
         log.debug("Обработка запроса GET/items/search");
         List<ItemDto> items = new ArrayList<>();
         Sort sort = Sort.by(Sort.Direction.ASC, "id");
-            int page = from / size;
-            Pageable pageable = PageRequest.of(page, size, sort);
-            items = itemService.search(text, pageable);
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size, sort);
+        items = itemService.search(text, pageable);
         log.debug("Получен список с размером: {}", items.size());
         return items;
     }
@@ -86,9 +86,9 @@ public class ItemController {
         log.debug("Обработка запроса GET/items");
         List<ItemWithDateResponseDto> items = new ArrayList<>();
         Sort sort = Sort.by(Sort.Direction.ASC, "id");
-            int page = from / size;
-            Pageable pageable = PageRequest.of(page, size, sort);
-            items = itemService.getAll(userId, pageable);
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size, sort);
+        items = itemService.getAll(userId, pageable);
         log.debug("Получен список с размером: {}", items.size());
         return items;
     }
