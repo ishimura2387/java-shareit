@@ -67,8 +67,8 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text,
-                                @RequestParam(defaultValue = "0") @Min(0) Integer from,
-                                @RequestParam(defaultValue = "10") @Min(1) Integer size) {
+                                @RequestParam(defaultValue = "0") @Min(0) int from,
+                                @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.debug("Обработка запроса GET/items/search");
         List<ItemDto> items = new ArrayList<>();
         Sort sort = Sort.by(Sort.Direction.ASC, "id");
@@ -81,8 +81,8 @@ public class ItemController {
 
     @GetMapping
     public List<ItemWithDateResponseDto> getAll(@RequestHeader(USER_ID) long userId,
-                                                @RequestParam(defaultValue = "0") @Min(0) Integer from,
-                                                @RequestParam(defaultValue = "10") @Min(1) Integer size) {
+                                                @RequestParam(defaultValue = "0") @Min(0) int from,
+                                                @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.debug("Обработка запроса GET/items");
         List<ItemWithDateResponseDto> items = new ArrayList<>();
         Sort sort = Sort.by(Sort.Direction.ASC, "id");

@@ -59,8 +59,8 @@ public class BookingController {
     @GetMapping
     public List<BookingDto> getByUser(@RequestHeader(USER_ID) long userId,
                                       @RequestParam(defaultValue = "ALL") String state,
-                                      @RequestParam(defaultValue = "0") @Min(0) Integer from,
-                                      @RequestParam(defaultValue = "10") @Min(1) Integer size) {
+                                      @RequestParam(defaultValue = "0") @Min(0) int from,
+                                      @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.debug("Обработка запроса GET/bookings");
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
         List<BookingDto> bookingDto = new ArrayList<>();
@@ -74,8 +74,8 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingDto> getByOwner(@RequestHeader(USER_ID) long userId,
                                        @RequestParam(defaultValue = "ALL") String state,
-                                       @RequestParam(defaultValue = "0") @Min(0) Integer from,
-                                       @RequestParam(defaultValue = "10") @Min(1) Integer size) {
+                                       @RequestParam(defaultValue = "0") @Min(0) int from,
+                                       @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.debug("Обработка запроса GET/bookings/owner");
         List<BookingDto> bookingDto = new ArrayList<>();
         Sort sort = Sort.by(Sort.Direction.DESC, "start");

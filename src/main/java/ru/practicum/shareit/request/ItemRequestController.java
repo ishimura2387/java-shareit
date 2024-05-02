@@ -49,8 +49,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestWithItemsResponseDto> getAllOther(@RequestHeader(USER_ID) long userId,
-                                                             @RequestParam(defaultValue = "0") @Min(0) Integer from,
-                                                             @RequestParam(defaultValue = "10") @Min(1) Integer size) {
+                                                             @RequestParam(defaultValue = "0") @Min(0) int from,
+                                                             @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.debug("Обработка запроса GET/requests/all");
         List<ItemRequestWithItemsResponseDto> itemRequests = new ArrayList<>();
         Sort sort = Sort.by(Sort.Direction.DESC, "created");

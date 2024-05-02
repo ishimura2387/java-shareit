@@ -86,11 +86,8 @@ public class ItemServiceImpl implements ItemService {
             ids.add(itemId);
             List<Booking> bookings = getBooking(ids);
             itemWithDateResponseDto = itemMapper.toItemDtoWithDate(item);
-            LocalDateTime localDateTime = LocalDateTime.now();
-            Optional<Booking> nextBooking = bookings.stream().filter(booking ->
-                    booking.getStart().isAfter(localDateTime)).reduce((a, b) -> b);
-            Optional<Booking> lastBooking = bookings.stream().filter(booking ->
-                    booking.getStart().isBefore(localDateTime)).findFirst();
+            Optional<Booking> nextBooking = getNextBooking(bookings);
+            Optional<Booking> lastBooking = getLastBooking(bookings);
             if (!nextBooking.isEmpty()) {
                 itemWithDateResponseDto.setNextBooking(bookingMapper.toBookingDtoShort(nextBooking.get()));
             }
@@ -124,22 +121,13 @@ public class ItemServiceImpl implements ItemService {
         List<Booking> allBookings = getBooking(itemIds);
         Map<Long, List<Comment>> itemComment = new HashMap<>();
         Map<Long, List<Booking>> itemBooking = new HashMap<>();
-        itemBooking = allBookings.stream().collect(Collectors.groupingBy(Booking::getItem)).entrySet().stream().map(entry ->
-                Map.entry(entry.getKey().getId(), entry.getValue())).collect(Collectors.toMap(Map.Entry::getKey,
-                Map.Entry::getValue));
-        itemComment = allComments.stream().collect(Collectors.groupingBy(Comment::getItem)).entrySet().stream().map(entry ->
-                Map.entry(entry.getKey().getId(), entry.getValue())).collect(Collectors.toMap(Map.Entry::getKey,
-                Map.Entry::getValue));
+        itemBooking = allBookings.stream().collect(Collectors.groupingBy(b -> b.getItem().getId()));
+        itemComment = allComments.stream().collect(Collectors.groupingBy(c -> c.getItem().getId()));
         for (Item item : items) {
             ItemWithDateResponseDto itemWithDateResponseDto = itemMapper.toItemDtoWithDate(item);
             if (itemBooking.get(item.getId()) != null) {
-                LocalDateTime localDateTime = LocalDateTime.now();
-                Optional<Booking> nextBooking = itemBooking.get(item.getId()).stream().filter(booking ->
-                        booking.getItem().getId().longValue() == item.getId().longValue()).filter(booking ->
-                        booking.getStart().isAfter(localDateTime)).reduce((a, b) -> b);
-                Optional<Booking> lastBooking = itemBooking.get(item.getId()).stream().filter(booking ->
-                        booking.getItem().getId().longValue() == item.getId().longValue()).filter(booking ->
-                        booking.getStart().isBefore(localDateTime)).findFirst();
+                Optional<Booking> nextBooking = getNextBooking(itemBooking.get(item.getId()));
+                Optional<Booking> lastBooking = getLastBooking(itemBooking.get(item.getId()));
                 if (!nextBooking.isEmpty()) {
                     itemWithDateResponseDto.setNextBooking(bookingMapper.toBookingDtoShort(nextBooking.get()));
                 }
@@ -170,5 +158,15 @@ public class ItemServiceImpl implements ItemService {
         List<Booking> bookings = bookingRepository.findAll(Status.APPROVED, itemIds,
                 Sort.by(Sort.Direction.DESC, "start"));
         return bookings;
+    }
+
+    private Optional<Booking> getNextBooking(List<Booking> bookings) {
+        LocalDateTime localDateTime = LocalDateTime.now();
+        return bookings.stream().filter(booking -> booking.getStart().isAfter(localDateTime)).reduce((a, b) -> b);
+    }
+
+    private Optional<Booking> getLastBooking(List<Booking> bookings) {
+        LocalDateTime localDateTime = LocalDateTime.now();
+        return bookings.stream().filter(booking -> booking.getStart().isBefore(localDateTime)).findFirst();
     }
 }
