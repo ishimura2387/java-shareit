@@ -7,11 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import ru.practicum.shareit.booking.dto.BookItemRequestDto;
-import ru.practicum.shareit.booking.dto.BookingState;
+import ru.practicum.shareit.booking.dto.BookingInputDto;
 import ru.practicum.shareit.client.BaseClient;
-
-import java.util.Map;
 
 @Service
 public class BookingClient extends BaseClient {
@@ -27,21 +24,28 @@ public class BookingClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getBookings(long userId, BookingState state, Integer from, Integer size) {
-        Map<String, Object> parameters = Map.of(
-                "state", state.name(),
-                "from", from,
-                "size", size
-        );
-        return get("?state={state}&from={from}&size={size}", userId, parameters);
+    public ResponseEntity<Object> addBooking(long userId, BookingInputDto requestDto) {
+        String path = "";
+        return post(path, userId, requestDto);
     }
 
-
-    public ResponseEntity<Object> bookItem(long userId, BookItemRequestDto requestDto) {
-        return post("", userId, requestDto);
+    public ResponseEntity<Object> setStatus(long bookingId, boolean approved, long userId) {
+        String path = "/" + bookingId + "?approved=" + approved;
+        return patch(path, userId);
     }
 
-    public ResponseEntity<Object> getBooking(long userId, Long bookingId) {
-        return get("/" + bookingId, userId);
+    public ResponseEntity<Object> get(long userId, long bookingId) {
+        String path = "/" + bookingId;
+        return get(path, userId);
+    }
+
+    public ResponseEntity<Object> getByUser(long userId, String state, Integer from, Integer size) {
+        String path = "?state=" + state + "&from=" + from + "&size=" + size;
+        return get(path, userId);
+    }
+
+    public ResponseEntity<Object> getByOwner(long userId, String state, Integer from, Integer size) {
+        String path = "/owner?state=" + state + "&from=" + from + "&size=" + size;
+        return get(path, userId);
     }
 }
