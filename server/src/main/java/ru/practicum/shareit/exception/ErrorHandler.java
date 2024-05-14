@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.validation.ConstraintViolationException;
-
 @RestControllerAdvice
 @Slf4j
 public class ErrorHandler {
@@ -25,13 +23,6 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleDataIntegrityViolationException(final DataIntegrityViolationException e) {
         log.info("DataIntegrityViolationException: {}", e.getMessage());
-        return new ErrorResponse(String.format(e.getMessage()));
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleConstraintViolationException(final ConstraintViolationException e) {
-        log.error("ConstraintViolationException: {}", e.getMessage());
         return new ErrorResponse(String.format(e.getMessage()));
     }
 

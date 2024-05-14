@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.context.annotation.Lazy;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -22,5 +23,6 @@ public class ItemDto {
     @NotNull
     private Boolean available;
     private List<CommentDto> comments;
+    @Lazy
     private long requestId;
 }

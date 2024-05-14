@@ -15,6 +15,7 @@ import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -145,6 +146,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> search(String text, Pageable pageable) {
+        if (text.isEmpty()) {
+            return Collections.emptyList();
+        }
         List<Item> items = new ArrayList<>();
         items = itemRepository.getItemsForRent(text, pageable);
         return items.stream().map(item -> itemMapper.fromItem(item)).collect(Collectors.toList());

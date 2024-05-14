@@ -21,6 +21,9 @@ services:
       - db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
+      - SPRING_DATASOURCE_USERNAME=sharer
+      - SPRING_DATASOURCE_PASSWORD=iamsharer
+
 
   db:
     image: postgres:13.7-alpine
